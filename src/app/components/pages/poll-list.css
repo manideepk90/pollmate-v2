@@ -1,0 +1,15 @@
+.poll-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(323px, 1fr));
+  gap: 10px;
+}
+
+/* Remove margin-left for small grids */
+.poll-list > :nth-child(even) {
+  margin-left: 0;
+}
+
+/* Apply margin-left only if there are more than two items */
+.poll-list:has(> :nth-child(n+3)) > :nth-child(even) {
+  margin-left: 80px;
+}

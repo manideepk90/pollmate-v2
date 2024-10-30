@@ -4,18 +4,33 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --primary: "#6A1B9A";
+  --secondary: "#FFA726";
+  --linear: linear-gradient(135deg, #6a1b9a, #ffa726);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.menu-item[data-active="true"] {
+  @apply font-semibold text-primary relative;
+}
+
+.menu-item {
+  position: relative;
+}
+
+.menu-item[data-active="true"]::after {
+  @apply absolute border-b-2 bottom-0 left-0 border-primary;
 }
