@@ -1,9 +1,11 @@
-import Image from "next/image";
+import HomePage from "@/app/components/pages/Home";
+import NavBar from "./components/navigation/NavBar";
 
 export default function Home() {
   return (
-    <div>
-      <h1>Home</h1>
+    <div className="w-full h-full">
+      <NavBar />
+      <HomePage />
     </div>
   );
 }

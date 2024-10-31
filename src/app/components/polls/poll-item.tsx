@@ -18,8 +18,8 @@ function PollItem({
       <div
         style={{
           background: "var(--linear)",
-          width: "323px",
-          height: "62px",
+          width: "250px",
+          height: "55px",
           borderRadius: "31px",
         }}
         className="flex flex-col relative 
@@ -27,8 +27,8 @@ function PollItem({
       >
         <div
           style={{
-            width: "317px",
-            height: "56px",
+            width: "244px",
+            height: "49px",
             borderRadius: "31px",
             top: "3px",
             left: "3px",
