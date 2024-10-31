@@ -90,7 +90,10 @@ function HomePage() {
             Discover Polls
           </h3>
         </div>
-        <PollList isStraight={true} />
+        <div className="w-full h-full flex items-center justify-center translate-x-[-30px] md:translate-x-0">
+          <PollList />
+        </div>
+
         <div>
           <Link href="/polls">
             <CommonButton className="px-6 py-3 rounded-full">
