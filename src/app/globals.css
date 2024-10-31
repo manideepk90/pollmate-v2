@@ -8,6 +8,8 @@
   --primary: "#6A1B9A";
   --secondary: "#FFA726";
   --linear: linear-gradient(135deg, #6a1b9a, #ffa726);
+  --linear-2: linear-gradient(225deg, #6a1b9a 20.97%, #ffa726 79.03%);
+  --linear-3: linear-gradient(99.17deg, #6a1b9a 0%, #ffa726 100%);
 }
 
 /* @media (prefers-color-scheme: dark) {

@@ -3,8 +3,12 @@ import CustomInput from "../inputs/CustomInput";
 import Image from "next/image";
 function SearchComponent({
   placeholder = "Search",
-  onChange = () => {},
+  onChange = (e) => {},
   value = "",
+}: {
+  placeholder?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  value?: string;
 }) {
   return (
     <div>
