@@ -1,24 +1,35 @@
+"use client";
 import React from "react";
 
 function CommonButton({
   children,
   callback = () => {},
   className = "",
+  disabled = false,
+  title = "",
+  variant = "primary",
+  style,
 }: {
   children: React.ReactNode;
   callback?: () => void;
-  paddingX?: string;
-  paddingY?: string;
-  borderRadius?: string;
-  color?: string;
-  backgroundColor?: string;
   className?: string;
+  disabled?: boolean;
+  title?: string;
+  variant?: "primary" | "outline";
+  style?: React.CSSProperties;
 }) {
   return (
     <button
       type="button"
-      className={`bg-primary text-white rounded-md px-4 py-1 ${className}`}
+      className={`${disabled ? "bg-gray-400" : "bg-primary"} ${
+        variant === "outline"
+          ? "bg-transparent border border-primary text-primary"
+          : "text-white"
+      }  rounded-md px-4 py-1 ${className}`}
       onClick={callback}
+      disabled={disabled}
+      title={title}
+      style={style}
     >
       {children}
     </button>

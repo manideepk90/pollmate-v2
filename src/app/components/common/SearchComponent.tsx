@@ -12,6 +12,7 @@ function SearchComponent({
         placeholder={placeholder}
         onChange={onChange}
         value={value}
+        isMaxCharacters={false}
         endIcon={
           <Image
             src={"/assets/icons/search.svg"}

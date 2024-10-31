@@ -1,15 +1,18 @@
+"use client";
 import React from "react";
 
 function CustomInput({
   placeholder = "Search",
-  onChange = () => {},
+  onChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {},
   value = "",
   type = "text",
   className = "",
-  style = {
-    padding: "5px 10px",
-    outline: "none",
-  },
+  style = {},
+  padding = "5px 10px",
+  outline = "none",
+  borderRadius = "rounded-3xl",
   disabled = false,
   required = false,
   autoFocus = false,
@@ -31,12 +34,28 @@ function CustomInput({
     marginBottom: "1px",
   },
   onSubmit = () => {},
+  description = "",
+  inputStyle = {},
+  multiline = false,
+  maxCharacters = 300,
+  isMaxCharacters = true,
+  maxRows = 3,
+  border = "border border-gray-700",
+  labelClassName = "",
+  onEndIconClick = () => {},
 }: {
+  borderRadius?: string;
   placeholder?: string;
-  onChange?: () => void;
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  multiline?: boolean;
   value?: string;
   type?: string;
   className?: string;
+  maxCharacters?: number;
+  maxRows?: number;
+  border?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
   required?: boolean;
@@ -48,6 +67,7 @@ function CustomInput({
   minLength?: number;
   pattern?: string;
   readOnly?: boolean;
+  padding?: string;
   autoSave?: string;
   list?: string;
   multiple?: boolean;
@@ -55,40 +75,80 @@ function CustomInput({
   endIcon?: React.ReactNode;
   label?: string;
   labelStyle?: React.CSSProperties;
+  description?: string;
   onSubmit?: () => void;
+  outline?: string;
+  inputStyle?: React.CSSProperties;
+  isMaxCharacters?: boolean;
+  labelClassName?: string;
+  onEndIconClick?: () => void;
 }) {
   return (
     <div className="flex flex-col items-start w-full">
-      {label && <label style={labelStyle}>{label}</label>}
-      <div className="flex items-center gap-2 w-full border px-4 border-gray-700 rounded-3xl">
-        <input
-          type={type}
-          placeholder={placeholder}
-          onChange={onChange}
-          //   value={value}
-          className={className}
-          style={style}
-          disabled={disabled}
-          required={required}
-          autoFocus={autoFocus}
-          autoComplete={autoComplete}
-          name={name}
-          id={id}
-          maxLength={maxLength}
-          minLength={minLength}
-          pattern={pattern}
-          readOnly={readOnly}
-          autoSave={autoSave}
-          list={list}
-          multiple={multiple}
-          size={size}
-        />
+      {label && (
+        <label className={labelClassName} style={labelStyle}>
+          {label}
+        </label>
+      )}
+      <div
+        style={{ padding, ...style }}
+        className={`flex items-center gap-2 w-full ${border} ${borderRadius}`}
+      >
+        {multiline ? (
+          <textarea
+            rows={maxRows}
+            placeholder={placeholder}
+            onChange={onChange}
+            value={value}
+            className={`${className} w-full`}
+            style={{ outline, ...inputStyle }}
+            disabled={disabled}
+            required={required}
+            autoFocus={autoFocus}
+            autoComplete={autoComplete}
+            name={name}
+            id={id}
+            maxLength={maxLength}
+            minLength={minLength}
+            readOnly={readOnly}
+            autoSave={autoSave}
+          />
+        ) : (
+          <input
+            type={type}
+            placeholder={placeholder}
+            onChange={onChange}
+            // value={value}
+            className={`${className} w-full`}
+            style={{ outline, ...inputStyle }}
+            disabled={disabled}
+            required={required}
+            autoFocus={autoFocus}
+            autoComplete={autoComplete}
+            name={name}
+            id={id}
+            maxLength={maxLength}
+            minLength={minLength}
+            pattern={pattern}
+            readOnly={readOnly}
+            autoSave={autoSave}
+            list={list}
+            multiple={multiple}
+            size={size}
+          />
+        )}
         {endIcon && (
-          <div className="cursor-pointer" onClick={onSubmit}>
+          <div className="cursor-pointer" onClick={onEndIconClick}>
             {endIcon}
           </div>
         )}
       </div>
+      {description && <p className="text-primary text-sm">{description} </p>}
+      {isMaxCharacters && maxCharacters && (
+        <p className="text-primary text-sm">
+          {maxCharacters} characters remaining
+        </p>
+      )}
     </div>
   );
 }

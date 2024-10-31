@@ -10,6 +10,6 @@
 }
 
 /* Apply margin-left only if there are more than two items */
-.poll-list:has(> :nth-child(n+3)) > :nth-child(even) {
+.poll-list[data-isstraight="false"] > :nth-child(even) {
   margin-left: 80px;
 }
