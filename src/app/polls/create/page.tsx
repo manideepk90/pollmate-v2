@@ -2,6 +2,7 @@
 import CommonButton from "@/app/components/buttons/CommonButton";
 import Space from "@/app/components/common/Space";
 import CustomInput from "@/app/components/inputs/CustomInput";
+import withAuth from "@/hoc/withAuth";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
 
@@ -52,8 +53,8 @@ function page() {
   };
 
   return (
-    <div className="flex flex-col gap-10 justify-center items-center py-10 px-3">
-      <div>
+      <div className="flex flex-col gap-10 justify-center items-center py-10 px-3">
+        <div>
         <h1 className="text-primary text-3xl font-bold">Create poll</h1>
       </div>
       <div className="flex flex-col gap-5 w-full max-w-3xl">
@@ -85,10 +86,10 @@ function page() {
           <div
             className="flex items-center justify-center w-full h-28 border border-primary rounded-md cursor-pointer"
             onClick={() => {
-              if (inputRef.current) {
-                inputRef.current.click();
-              }
-            }}
+                if (inputRef.current) {
+                  inputRef.current.click();
+                }
+              }}
           >
             {imagePreview ? (
               <Image
@@ -203,8 +204,9 @@ function page() {
         </div> */}
       </div>
       <Space height="100px" />
-    </div>
+      </div>
+
   );
 }
 
-export default page;
+export default withAuth(page);

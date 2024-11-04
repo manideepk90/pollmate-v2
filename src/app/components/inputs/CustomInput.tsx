@@ -118,7 +118,7 @@ function CustomInput({
             type={type}
             placeholder={placeholder}
             onChange={onChange}
-            // value={value}
+            value={value}
             className={`${className} w-full`}
             style={{ outline, ...inputStyle }}
             disabled={disabled}
