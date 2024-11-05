@@ -12,17 +12,17 @@ function PollPage({
     updatedAt: new Date(),
     options: [
       {
-        title: "test",
+        value: "test",
         votes: 60,
       },
       {
-        title: "test2",
+        value: "test2",
         votes: 10,
       },
     ],
   },
 }: {
-  poll?: Poll;
+  poll?: Poll | null;
 }) {
   return (
     <div
@@ -81,7 +81,7 @@ function PollPage({
           <PollOptionItem
             key={index}
             option={option}
-            active={option.title === "test"}
+            active={option.value === "test"}
           />
         ))}
       </div>

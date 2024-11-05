@@ -2,11 +2,23 @@
 import CommonButton from "@/app/components/buttons/CommonButton";
 import Space from "@/app/components/common/Space";
 import CustomInput from "@/app/components/inputs/CustomInput";
+import { db } from "@/firebase/initFirebase";
+import { collection, addDoc } from "firebase/firestore";
 import withAuth from "@/hoc/withAuth";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
+import { ref } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 function page() {
+  const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [description, setDescription] = useState("");
+  const router = useRouter();
   const [options, setOptions] = useState<{ key: string; value: string }[]>([
     { key: "1", value: "" },
     { key: "2", value: "" },
@@ -14,6 +26,7 @@ function page() {
   const [key, setKey] = useState(3);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { user } = useAuth() as any;
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -52,9 +65,77 @@ function page() {
     ]);
   };
 
+  const handlePostPoll = async () => {
+    setLoading(true);
+    if (title.trim() === "" || description.trim() === "") {
+      toast.error("Title and description are required");
+      return;
+    }
+    if (options.length < 2) {
+      toast.error("At least 2 options are required");
+      return;
+    }
+
+    if (options.some((option) => option.value.trim() === "")) {
+      toast.error("All options are required");
+      return;
+    }
+
+    if (!user) {
+      toast.error("User not found");
+      return;
+    }
+    let downloadURL = null;
+    if (image) {
+      if (image.size > 10 * 1024 * 1024) {
+        toast.error("Image size should be less than 10MB");
+        return;
+      }
+      const storage = getStorage();
+      const storageRef = ref(storage, `users/${user.uid}/profile.jpg`);
+      await uploadBytes(storageRef, image);
+      toast.success("Image uploaded successfully");
+      downloadURL = await getDownloadURL(storageRef);
+    }
+    try {
+      const polluuid = uuidv4();
+      const pollDoc = {
+        createdBy: user.uid,
+        createdAt: new Date(),
+        updatedAt: null,
+        title: title,
+        description: description,
+        image: downloadURL || null,
+        options: options.map((option) => ({
+          value: option.value,
+          votes: 0,
+        })),
+        endDate: null,
+        isActive: true,
+        isDeleted: false,
+        isAnonymous: false,
+        public_link:
+          title.toLowerCase().replace(/ /g, "-") +
+          "-" +
+          polluuid.slice(0, 8),
+      };
+      const pollId = await addDoc(collection(db, "polls"), pollDoc);
+
+      toast.success("Poll created successfully");
+      router.push(`/polls/${pollDoc.public_link}`);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(`Error creating poll ${error.message}`);
+    } finally {
+      setLoading(false);
+      // toast.dismiss();
+    }
+  };
+
   return (
-      <div className="flex flex-col gap-10 justify-center items-center py-10 px-3">
-        <div>
+    <div className="flex flex-col gap-10 justify-center items-center py-10 px-3">
+      <Toaster />
+      <div>
         <h1 className="text-primary text-3xl font-bold">Create poll</h1>
       </div>
       <div className="flex flex-col gap-5 w-full max-w-3xl">
@@ -62,6 +143,8 @@ function page() {
           <h2 className="text-primary text-2xl font-bold">Poll title</h2>
           <CustomInput
             placeholder="Poll title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             borderRadius="rounded-md"
             description="This is the title of your poll. It will be displayed at the top of your poll."
             padding="2px 6px"
@@ -73,6 +156,8 @@ function page() {
           <h2 className="text-primary text-2xl font-bold">Poll description</h2>
           <CustomInput
             placeholder="Poll description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             borderRadius="rounded-md"
             description="This is the description of your poll. It will be displayed below the title."
             padding="2px 6px"
@@ -86,10 +171,10 @@ function page() {
           <div
             className="flex items-center justify-center w-full h-28 border border-primary rounded-md cursor-pointer"
             onClick={() => {
-                if (inputRef.current) {
-                  inputRef.current.click();
-                }
-              }}
+              if (inputRef.current) {
+                inputRef.current.click();
+              }
+            }}
           >
             {imagePreview ? (
               <Image
@@ -181,9 +266,10 @@ function page() {
             Add option
           </CommonButton>
           <CommonButton
+            loading={loading}
             variant="outline"
             callback={() => {
-              console.log(options);
+              handlePostPoll();
             }}
             className="w-full h-12"
           >
@@ -204,8 +290,7 @@ function page() {
         </div> */}
       </div>
       <Space height="100px" />
-      </div>
-
+    </div>
   );
 }
 

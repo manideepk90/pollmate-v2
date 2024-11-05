@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"; // Import useSearc
 import { doc, getDoc, setDoc } from "firebase/firestore"; // Import Firestore methods
 import { db, auth } from "@/firebase/initFirebase";
 import CommonButton from "../buttons/CommonButton";
+import toast, { Toaster } from "react-hot-toast";
 
 const providers = [
   {
@@ -17,12 +18,11 @@ const providers = [
 const GoogleLoginProvider = () => {
   const router = useRouter();
   const searchParams = useSearchParams(); // Fetch URL parameters
-  const pollId = searchParams.get("pollId"); // Get pollId from the query parameters
+  const returnUrl = searchParams.get("returnUrl"); // Get pollId from the query parameters
 
   const checkIfNewUser = async (uid: string) => {
     const userDoc = doc(db, "users", uid);
     const userRef = await getDoc(userDoc);
-    console.log("Checking if user exists in Firestore:", userRef.exists());
     return userRef;
   };
 
@@ -33,17 +33,16 @@ const GoogleLoginProvider = () => {
       email: user.email,
       name: user.displayName,
       image: user.photoURL,
-    });
-    console.log("New user created in Firestore:", {
-      uid: user.uid,
-      email: user.email,
-      name: user.displayName,
-      image: user.photoURL,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isAdmin: false,
     });
   };
 
+
   const handleSignin = async (providerName: string) => {
     if (providerName === "google") {
+      
       const provider = new GoogleAuthProvider();
       try {
         const result = await signInWithPopup(auth, provider);
@@ -60,12 +59,13 @@ const GoogleLoginProvider = () => {
           console.log("New user created, redirecting...");
         }
 
-        if (pollId) {
-          router.push(`/adminDashboard/${pollId}`);
+        if (returnUrl) {
+          router.push(`${returnUrl}`);
         } else {
-          router.push("/adminDashboard");
+          router.push("/dashboard");
         }
       } catch (error: any) {
+        toast.error(error.message);
         console.error("Error signing in:", error.message);
       }
     }
@@ -73,6 +73,7 @@ const GoogleLoginProvider = () => {
 
   return (
     <div>
+      <Toaster />
       {providers.map((item, index) => (
         <CommonButton
           callback={() => handleSignin(item.name)}

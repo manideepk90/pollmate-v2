@@ -5,7 +5,7 @@ type Poll = {
   createdAt: Date;
   updatedAt: Date;
   options: {
-    title: string;
+    value: string;
     votes: number;
   }[];
   publicLink?: string;

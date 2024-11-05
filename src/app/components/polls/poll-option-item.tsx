@@ -3,13 +3,13 @@ import React from "react";
 function PollOptionItem({
   active = false,
   option = {
-    title: "option",
+    value: "option",
     votes: 0,
   },
 }: {
   active?: boolean;
   option?: {
-    title?: string;
+    value?: string;
     votes?: number;
   };
 }) {
@@ -21,7 +21,7 @@ function PollOptionItem({
     `}
     >
       <p className={`text-xl ${active ? "text-white" : "text-primary"}`}>
-        {option?.title}
+        {option?.value}
       </p>
       <p className={`text-sm ${active ? "text-white" : "text-slate-500"}`}>
         {option?.votes} votes
