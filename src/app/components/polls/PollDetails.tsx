@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import PollOptionItem from "./poll-option-item";
+import PollOptionItem from "./PollOption";
 import CommonButton from "../buttons/CommonButton";
 import { formatDate } from "@/app/utils/dateUtils";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ import { getPoll, votePoll, updatePollViews } from "@/app/utils/polls";
 import { getLocalStorage, setLocalStorage } from "@/app/utils/localStorage";
 import toast, { Toaster } from "react-hot-toast";
 
-function PollPage() {
+function PollDetails() {
   const { id: link } = useParams();
   const [poll, setPoll] = useState<Poll | null>(null);
   const [voted, setVoted] = useState<string | null>(null);
@@ -171,4 +171,4 @@ function PollPage() {
   );
 }
 
-export default PollPage;
+export default PollDetails;

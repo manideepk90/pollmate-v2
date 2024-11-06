@@ -7,8 +7,6 @@ import {
   startAfter,
   getDocs,
   doc,
-  setDoc,
-  getDoc,
   updateDoc,
   increment,
   runTransaction,
@@ -152,5 +150,41 @@ export const votePoll = async (
     console.error("Error voting:", error);
     toast.error("Failed to submit vote");
     return null;
+  }
+};
+
+export const updatePollPublicLink = async (
+  pollId: string,
+  newPublicLink: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // Validate the public link format
+    if (!newPublicLink.trim()) {
+      throw new Error("Public link cannot be empty");
+    }
+
+    // Check if the link is already taken
+    const pollsRef = collection(db, "polls");
+    const q = query(pollsRef, where("public_link", "==", newPublicLink));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty && querySnapshot.docs[0].id !== pollId) {
+      throw new Error("This public link is already taken");
+    }
+
+    // Update the poll
+    const pollRef = doc(db, "polls", pollId);
+    await updateDoc(pollRef, {
+      public_link: newPublicLink,
+      updatedAt: new Date().toISOString()
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating public link:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update public link"
+    };
   }
 };

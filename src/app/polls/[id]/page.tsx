@@ -1,6 +1,6 @@
 import AdComponent from "@/app/components/Ads/AdComponent";
-import PollList from "@/app/components/pages/poll-list";
-import PollPage from "@/app/components/polls/PollPage";
+import PollList from "@/app/components/pages/PollList";
+import PollDetails from "@/app/components/polls/PollDetails";
 import React from "react";
 
 function Page() {
@@ -8,7 +8,7 @@ function Page() {
     <div className="flex flex-col gap-10 mb-20">
       <div className="min-w-full min-h-full flex gap-5 md:flex-row flex-col md:p-5 p-2 ">
         <AdComponent />
-        <PollPage />
+        <PollDetails />
         <AdComponent />
       </div>
       <div className="flex flex-col gap-10 justify-center items-center">

@@ -6,11 +6,11 @@ import { formatDate } from "@/app/utils/dateUtils";
 import { formatNumber } from "@/app/utils/numberUtils";
 import { exportPollToCSV } from "@/app/utils/exportUtils";
 
-interface PollDashboardProps {
+interface PollAnalyticsProps {
   poll: Poll;
 }
 
-function PollDashboard({ poll }: PollDashboardProps) {
+function PollAnalytics({ poll }: PollAnalyticsProps) {
   const { sortedOptions, totalVotes } = useMemo(() => {
     const sorted = [...poll.options].sort(
       (a, b) => (b.votes || 0) - (a.votes || 0)
@@ -127,4 +127,4 @@ function PollDashboard({ poll }: PollDashboardProps) {
   );
 }
 
-export default PollDashboard;
+export default PollAnalytics;

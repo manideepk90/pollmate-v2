@@ -6,17 +6,22 @@ import { formatNumber } from "@/app/utils/numberUtils";
 import { deletePoll } from "@/app/utils/polls";
 import { ConfirmDialog } from "@/app/components/common/ConfirmDialog";
 import { toast } from "react-hot-toast";
+import { Dialog } from "@/app/components/common/Dialog";
+import { updatePollPublicLink } from "@/app/utils/polls";
 
 interface PollListItemProps {
   poll?: Poll;
-  onPollDeleted?: (pollId: string) => void;
+  onPollUpdated?: (pollId: string) => void;
 }
 
 import { exportPollToCSV } from "@/app/utils/exportUtils";
 
-function PollListItem({ poll, onPollDeleted }: PollListItemProps) {
+function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [publicLink, setPublicLink] = useState(poll?.public_link || "");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const { topOptions, othersVotes, totalVotes } = useMemo(() => {
     if (!poll?.options?.length) {
@@ -70,13 +75,49 @@ function PollListItem({ poll, onPollDeleted }: PollListItemProps) {
 
     if (result.success) {
       toast.success("Poll deleted successfully");
-      onPollDeleted?.(poll.id); // This will trigger the refresh
+      onPollUpdated?.(poll.id);
     } else {
       toast.error(result.error || "Failed to delete poll");
     }
 
     setIsDeleting(false);
     setIsDeleteDialogOpen(false);
+  };
+
+  const handleUpdatePublicLink = async () => {
+    if (!poll?.id || isUpdating) return;
+
+    // Basic validation
+    const trimmedLink = publicLink.trim();
+    if (!trimmedLink) {
+      toast.error("Public link cannot be empty");
+      return;
+    }
+
+    // Format the link
+    const formattedLink = trimmedLink
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    setIsUpdating(true);
+    try {
+      const result = await updatePollPublicLink(poll.id, formattedLink);
+
+      if (result.success) {
+        toast.success("Public link updated successfully");
+        // Trigger refresh with the updated poll
+        onPollUpdated?.(poll.id);
+        setIsEditModalOpen(false);
+      } else {
+        toast.error(result.error || "Failed to update public link");
+      }
+    } catch (error) {
+      toast.error("Failed to update public link");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -160,7 +201,14 @@ function PollListItem({ poll, onPollDeleted }: PollListItemProps) {
                 height={20}
               />
             </button>
-            <Link href={`/polls/${poll?.public_link}/edit`}>
+
+            <button
+              className="hover:opacity-70 transition-opacity"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsEditModalOpen(true);
+              }}
+            >
               <Image
                 src="/assets/icons/edit.svg"
                 alt="edit"
@@ -168,7 +216,7 @@ function PollListItem({ poll, onPollDeleted }: PollListItemProps) {
                 height={20}
                 className="hover:opacity-70 transition-opacity"
               />
-            </Link>
+            </button>
             <button
               className="hover:opacity-70 transition-opacity"
               onClick={handleDownload}
@@ -203,6 +251,61 @@ function PollListItem({ poll, onPollDeleted }: PollListItemProps) {
         title="Delete Poll"
         message="Are you sure you want to delete this poll? This action cannot be undone."
       />
+
+      <Dialog
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Public Link"
+      >
+        <div className="p-4">
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Public Link
+            </label>
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                value={publicLink}
+                onChange={(e) => setPublicLink(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Enter public link"
+                disabled={isUpdating}
+              />
+              <p className="text-sm text-gray-500">
+                This will be the URL for your poll:
+                <span className="text-primary">
+                  /polls/
+                  {publicLink
+                    .toLowerCase()
+                    .replace(/[^a-z0-9-]/g, "-")
+                    .replace(/-+/g, "-")
+                    .replace(/^-|-$/g, "") || "your-link"}
+                </span>
+              </p>
+              <p className="text-xs text-gray-400">
+                Only letters, numbers, and hyphens are allowed. Spaces will be
+                converted to hyphens.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setIsEditModalOpen(false)}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+              disabled={isUpdating}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpdatePublicLink}
+              disabled={isUpdating || !publicLink.trim()}
+              className="px-4 py-2 text-sm bg-primary text-white rounded-md hover:bg-primary/80 disabled:opacity-50"
+            >
+              {isUpdating ? "Updating..." : "Update"}
+            </button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import PollList from "../components/pages/poll-list";
+import PollList from "../components/pages/PollList";
 
 function Page() {
   return (

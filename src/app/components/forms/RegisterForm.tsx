@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomInput from "../inputs/CustomInput";
 import CommonButton from "../buttons/CommonButton";
 import GoogleLoginProvider from "./GoogleLoginProvider";
 import Link from "next/link";
 import { toast, Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/firebase/initFirebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -21,6 +21,21 @@ interface RegisterData {
 function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl");
+
+  // Add useEffect to check auth state
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Redirect to returnUrl if it exists, otherwise to default page
+        router.push(returnUrl || "/polls/my-polls");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router, returnUrl]);
+
   const [data, setData] = useState<RegisterData>({
     email: "",
     password: "",
@@ -108,8 +123,8 @@ function RegisterForm() {
       toast.dismiss(loadingToast);
       toast.success("Welcome to PollMate! Your account has been created.");
 
-      // Redirect to dashboard
-      router.push("/dashboard");
+      // Redirect to returnUrl if it exists, otherwise to default page
+      router.push(returnUrl || "/polls/my-polls");
     } catch (error: any) {
       let errorMessage = "Registration failed. Please try again.";
 

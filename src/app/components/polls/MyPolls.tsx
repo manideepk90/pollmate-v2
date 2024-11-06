@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import CustomChart from "../Chart/CustomChart";
 import PollListItem from "../pages/poll-list2";
 import { useAuth } from "@/app/context/AuthContext";
@@ -21,10 +21,10 @@ interface ChartData {
   value: number;
 }
 
-function MyPollsPage() {
+function MyPolls() {
   const { userData } = useAuth();
   const [polls, setPolls] = useState<Poll[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<PollStats>({
     totalViews: 0,
     totalVotes: 0,
@@ -32,13 +32,11 @@ function MyPollsPage() {
     pollsCount: 0,
   });
 
-  const fetchUserPolls = async () => {
-    if (!userData?.uid) return;
-
+  const fetchPolls = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const pollsRef = collection(db, "polls");
-      const q = query(pollsRef, where("createdBy", "==", userData.uid));
+      const q = query(pollsRef, where("createdBy", "==", userData?.uid));
       const querySnapshot = await getDocs(q);
 
       const fetchedPolls = querySnapshot.docs.map((doc) => ({
@@ -69,41 +67,27 @@ function MyPollsPage() {
       setStats(newStats);
     } catch (error) {
       console.error("Error fetching polls:", error);
-      toast.error("Failed to fetch your polls");
+      toast.error("Failed to load polls");
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchUserPolls();
   }, [userData?.uid]);
+
+  // Initial load
+  useEffect(() => {
+    fetchPolls();
+  }, [fetchPolls]);
+
+  const handlePollUpdated = async (pollId: string) => {
+    // Refresh the polls list
+    await fetchPolls();
+  };
 
   const chartData: ChartData[] = [
     { name: "Total Views", value: stats.totalViews },
     { name: "Total Votes", value: stats.totalVotes },
     { name: "Total Shares", value: stats.totalShares },
   ];
-
-  const handlePollDeleted = (pollId: string) => {
-    // Update polls list
-    setPolls((currentPolls) =>
-      currentPolls.filter((poll) => poll.id !== pollId)
-    );
-
-    // Update stats
-    setStats((prevStats) => ({
-      ...prevStats,
-      pollsCount: prevStats.pollsCount - 1,
-      totalViews:
-        prevStats.totalViews - (polls.find((p) => p.id === pollId)?.views || 0),
-      totalVotes:
-        prevStats.totalVotes -
-        (polls
-          .find((p) => p.id === pollId)
-          ?.options.reduce((sum, opt) => sum + (opt.votes || 0), 0) || 0),
-    }));
-  };
 
   if (loading) {
     return (
@@ -142,7 +126,7 @@ function MyPollsPage() {
             <PollListItem
               key={poll.id}
               poll={poll}
-              onPollDeleted={handlePollDeleted}
+              onPollUpdated={handlePollUpdated}
             />
           ))
         ) : (
@@ -165,4 +149,4 @@ const StatsCard = ({ title, value }: { title: string; value: number }) => (
   </div>
 );
 
-export default MyPollsPage;
+export default MyPolls;

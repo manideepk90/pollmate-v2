@@ -1,11 +1,11 @@
 "use client";
-import PollDashboard from "@/app/components/polls/PollDashboard";
+import PollAnalytics from "@/app/components/polls/PollAnalytics";
 import { getPoll } from "@/app/utils/polls";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-function PollAnalytics() {
+function PollAnalyticsPage() {
   const { link } = useParams();
   const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ function PollAnalytics() {
     return <div>Poll not found</div>;
   }
 
-  return <PollDashboard poll={poll} />;
+  return <PollAnalytics poll={poll} />;
 }
 
-export default PollAnalytics;
+export default PollAnalyticsPage;

@@ -2,7 +2,7 @@ import Image from "next/image";
 import React from "react";
 import CommonButton from "../buttons/CommonButton";
 import Link from "next/link";
-import PollList from "./poll-list";
+import PollList from "./PollList";
 import Logo from "../common/logo";
 
 function HomePage() {

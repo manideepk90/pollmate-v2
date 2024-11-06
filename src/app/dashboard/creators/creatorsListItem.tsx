@@ -1,9 +1,23 @@
 import CommonButton from "@/app/components/buttons/CommonButton";
+import { User } from "firebase/auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-function CreatorsListItem() {
+interface Creator {
+  name: string;
+  email: string;
+  reports?: number;
+  pollsCount?: number;
+  pollViews?: number;
+  id: string;
+}
+
+interface CreatorItemProps {
+  creator: Creator;
+}
+
+const CreatorsListItem: React.FC<CreatorItemProps> = ({ creator }) => {
   return (
     <div
       style={{ background: "var(--linear)", borderRadius: "10px" }}

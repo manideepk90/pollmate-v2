@@ -1,6 +1,6 @@
 import React from "react";
 
-function PollOptionItem({
+function PollOption({
   active = false,
   option = {
     value: "option",
@@ -36,4 +36,4 @@ function PollOptionItem({
   );
 }
 
-export default PollOptionItem;
+export default PollOption;

@@ -1,13 +1,12 @@
-import Image from "next/image";
-import React from "react";
-import CardItem from "../dashboard/CardItem";
+"use client";
 import Tiles from "./tiles";
 import TrendingPolls from "./TrendingPolls";
 import Creators from "../dashboard/Creators";
+import withAdminAuth from "@/hoc/withAdminAuth";
 
 function DashboardPage() {
   return (
-    <main className="w-full h-full flex flex-col items-center justify-center p-10 gap-16">
+    <main className="w-full h-full flex flex-col items-center justify-center p-4 md:p-10 gap-8 md:gap-16">
       <Tiles />
       <TrendingPolls />
       <Creators />
@@ -15,4 +14,4 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage;
+export default withAdminAuth(DashboardPage);

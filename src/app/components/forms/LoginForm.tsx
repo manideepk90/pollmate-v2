@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomInput from "../inputs/CustomInput";
 import CommonButton from "../buttons/CommonButton";
 import Link from "next/link";
@@ -7,12 +7,25 @@ import GoogleLoginProvider from "./GoogleLoginProvider";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { toast, Toaster } from "react-hot-toast";
 import { auth } from "@/firebase/initFirebase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [data, setData] = useState({ email: "", password: "" });
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl");
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        router.push(returnUrl || "/polls/my-polls");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router, returnUrl]);
+
   const handleLogin = async () => {
     setLoading(true);
     const { email, password } = data;
@@ -36,9 +49,25 @@ function LoginForm() {
     const loadingToastId = toast.loading("Logging in...");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Get user's custom claims (including admin status)
+      const idTokenResult = await user.getIdTokenResult();
+      const isAdmin = idTokenResult.claims.admin === true;
+
       toast.success("Welcome back! You've successfully logged in.");
-      router.push("/dashboard");
+
+      // Route based on admin status
+      if (isAdmin) {
+        router.push("/dashboard");
+      } else {
+        router.push(returnUrl || "/polls/my-polls");
+      }
     } catch (error: any) {
       console.error(error.message);
       toast.error("Oops! Something went wrong. Please try again.");
@@ -82,7 +111,10 @@ function LoginForm() {
         <GoogleLoginProvider />
         <p className="text-sm text-gray-500">
           Don't have an account?{" "}
-          <Link className="text-blue-500" href="/register">
+          <Link
+            className="text-blue-500"
+            href={"/register?returnUrl=" + returnUrl}
+          >
             Register
           </Link>
         </p>

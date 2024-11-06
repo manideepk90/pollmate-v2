@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React from "react";
 
-function PollItem({ poll }: { poll?: Poll }) {
+function PollCard({ poll }: { poll?: Poll }) {
   return (
     <Link href={`/polls/${poll?.public_link || ""}`}>
       <div
@@ -32,4 +32,4 @@ function PollItem({ poll }: { poll?: Poll }) {
   );
 }
 
-export default PollItem;
+export default PollCard;

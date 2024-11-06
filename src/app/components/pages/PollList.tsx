@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import PollItem from "../polls/poll-item";
+import PollItem from "../polls/PollCard";
 import "./poll-list.css";
 import getPolls from "@/app/utils/polls";
 import CommonButton from "../buttons/CommonButton";

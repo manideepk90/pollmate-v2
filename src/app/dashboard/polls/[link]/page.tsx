@@ -1,10 +1,8 @@
-import CommonButton from "@/app/components/buttons/CommonButton";
-import CustomChart from "@/app/components/Chart/CustomChart";
-import PollDashboard from "@/app/components/polls/PollDashboard";
+import PollAnalytics from "@/app/components/polls/PollAnalytics";
 import React from "react";
 
 function page() {
-  return <PollDashboard poll={poll} />;
+  return <PollAnalytics poll={{} as Poll} />;
 }
 
 export default page;

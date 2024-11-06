@@ -8,7 +8,7 @@ function page() {
   return (
     <section className="w-full h-full flex flex-col justify-center gap-4">
       <h1 className="text-primary text-3xl font-bold">Polls</h1>
-      <CustomChart />
+      <CustomChart data={[]} />
       <h3 className="text-primary text-2xl font-bold">list</h3>
       <div className="w-full h-full flex gap-4 flex-col">
         <DashboardPollItemWithBlock />

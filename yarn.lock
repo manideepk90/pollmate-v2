@@ -2858,10 +2858,11 @@ pirates@^4.0.1:
     file-saver "^2.0.5"
     firebase "^11.0.1"
     next "15.0.2"
-    pollmate-v2 "file:C:/Users/manid/AppData/Local/Yarn/Cache/v6/npm-pollmate-v2-0.1.0-a60b0a66-6aa8-4652-8a3b-7f4ebaead698-1730901329899/node_modules/pollmate-v2"
+    pollmate-v2 "file:C:/Users/manid/AppData/Local/Yarn/Cache/v6/npm-pollmate-v2-0.1.0-5b46878d-ab0c-48d5-90a3-07c7522133f3-1730922134647/node_modules/pollmate-v2"
     react "19.0.0-rc-02c0e824-20241028"
     react-dom "19.0.0-rc-02c0e824-20241028"
     react-hot-toast "^2.4.1"
+    react-icons "^4.10.1"
     recharts "^2.13.3"
     uuid "^11.0.2"
 
@@ -2987,6 +2988,11 @@ react-hot-toast@^2.4.1:
   integrity sha512-j8z+cQbWIM5LY37pR6uZR6D4LfseplqnuAO4co4u8917hBUvXlEqyP1ZzqVLcqoyUesZZv/ImreoCeHVDpE5pQ==
   dependencies:
     goober "^2.1.10"
+
+react-icons@^4.10.1:
+  version "4.12.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.12.0.tgz#54806159a966961bfd5cdb26e492f4dafd6a8d78"
+  integrity sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==
 
 react-is@^16.13.1:
   version "16.13.1"
