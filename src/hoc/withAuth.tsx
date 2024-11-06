@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase/initFirebase';
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase/initFirebase";
 
 const withAuth = (WrappedComponent: React.ComponentType) => {
   const AuthenticatedComponent = (props: any) => {
@@ -29,15 +29,15 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
       return (
         <div
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'rgba(128, 128, 128, 0.8)', // Grey background with some transparency
-            padding: '20px',
-            borderRadius: '8px',
-            color: 'white',
-            textAlign: 'center',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(128, 128, 128, 0.8)", // Grey background with some transparency
+            padding: "20px",
+            borderRadius: "8px",
+            color: "white",
+            textAlign: "center",
           }}
         >
           Redirecting to login page...
@@ -51,4 +51,4 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
   return AuthenticatedComponent;
 };
 
-export default withAuth; 
+export default withAuth;

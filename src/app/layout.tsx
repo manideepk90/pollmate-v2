@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { DM_Sans } from "next/font/google";
+import { AuthProvider } from "./context/AuthContext";
 
 const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
@@ -23,7 +24,7 @@ export default function RootLayout({
       <body
         className={`${dmSans.className} antialiased max-w-screen-xl flex flex-col items-center mx-auto w-full`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

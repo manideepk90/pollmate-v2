@@ -1,20 +1,10 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-function PollItem({
-  poll = {
-    title: "Fav Movie",
-    description: "What is your favorite movie?",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    options: [],
-    publicLink: "123",
-  },
-}: {
-  poll?: Poll;
-}) {
+
+function PollItem({ poll }: { poll?: Poll }) {
   return (
-    <Link href={`/polls/${poll?.publicLink || ""}`}>
+    <Link href={`/polls/${poll?.public_link || ""}`}>
       <div
         style={{
           background: "var(--linear)",
@@ -35,7 +25,7 @@ function PollItem({
           }}
           className="absolute bg-white grid place-items-center"
         >
-          <h3 className="text-primary text-2xl">{poll?.title}</h3>
+          <h3 className="text-primary text-2xl">{poll?.title.slice(0, 20)}</h3>
         </div>
       </div>
     </Link>

@@ -43,6 +43,7 @@ function CustomInput({
   border = "border border-gray-700",
   labelClassName = "",
   onEndIconClick = () => {},
+  onKeyDown = () => {},
 }: {
   borderRadius?: string;
   placeholder?: string;
@@ -77,6 +78,7 @@ function CustomInput({
   labelStyle?: React.CSSProperties;
   description?: string;
   onSubmit?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   outline?: string;
   inputStyle?: React.CSSProperties;
   isMaxCharacters?: boolean;
@@ -135,6 +137,8 @@ function CustomInput({
             list={list}
             multiple={multiple}
             size={size}
+            onSubmit={onSubmit}
+            onKeyDown={onKeyDown}
           />
         )}
         {endIcon && (
@@ -153,4 +157,4 @@ function CustomInput({
   );
 }
 
-export default CustomInput;
+export default  CustomInput;

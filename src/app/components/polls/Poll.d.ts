@@ -1,12 +1,16 @@
 type Poll = {
-  _id?: string;
+  id?: string;
   title: string;
   description: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: "";
+  updatedAt: "";
   options: {
     value: string;
     votes: number;
   }[];
-  publicLink?: string;
+  public_link?: string;
+  views: number;
+  isBlocked: boolean;
+  image?: string;
+  createdBy: string;
 };

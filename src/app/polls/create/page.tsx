@@ -67,28 +67,43 @@ function page() {
 
   const handlePostPoll = async () => {
     setLoading(true);
-    if (title.trim() === "" || description.trim() === "") {
-      toast.error("Title and description are required");
+    if (title.trim() === "") {
+      toast.error("Title is required");
+      setLoading(false);
       return;
     }
     if (options.length < 2) {
       toast.error("At least 2 options are required");
+      setLoading(false);
       return;
     }
 
     if (options.some((option) => option.value.trim() === "")) {
       toast.error("All options are required");
+      setLoading(false);
+      return;
+    }
+
+    // Check for duplicate option values
+    const optionValues = options.map((option) => option.value.trim());
+    const uniqueValues = new Set(optionValues);
+
+    if (uniqueValues.size !== optionValues.length) {
+      toast.error("Option values must be unique");
+      setLoading(false);
       return;
     }
 
     if (!user) {
       toast.error("User not found");
+      setLoading(false);
       return;
     }
     let downloadURL = null;
     if (image) {
       if (image.size > 10 * 1024 * 1024) {
         toast.error("Image size should be less than 10MB");
+        setLoading(false);
         return;
       }
       const storage = getStorage();
@@ -101,21 +116,27 @@ function page() {
       const polluuid = uuidv4();
       const pollDoc = {
         createdBy: user.uid,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
         updatedAt: null,
         title: title,
-        description: description,
+        description: description || "",
         image: downloadURL || null,
         options: options.map((option) => ({
           value: option.value,
           votes: 0,
         })),
+        views: 0,
         endDate: null,
         isActive: true,
         isDeleted: false,
+        isBlocked: false,
         isAnonymous: false,
         public_link:
-          title.toLowerCase().replace(/ /g, "-") +
+          title
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "-") // Replace anything that's not a letter or number with hyphen
+            .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+            .replace(/^-+|-+$/g, "") + // Remove hyphens from start and end
           "-" +
           polluuid.slice(0, 8),
       };

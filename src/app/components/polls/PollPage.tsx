@@ -1,29 +1,95 @@
+"use client";
 import Image from "next/image";
-import React from "react";
-import PollItem from "./poll-item";
+import React, { useEffect, useState } from "react";
 import PollOptionItem from "./poll-option-item";
 import CommonButton from "../buttons/CommonButton";
+import { formatDate } from "@/app/utils/dateUtils";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { getPoll, votePoll, updatePollViews } from "@/app/utils/polls";
+import { getLocalStorage, setLocalStorage } from "@/app/utils/localStorage";
+import toast, { Toaster } from "react-hot-toast";
 
-function PollPage({
-  poll = {
-    title: "Fav movie max-60 characters",
-    description: "movie description for the app max-350 characters",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    options: [
-      {
-        value: "test",
-        votes: 60,
-      },
-      {
-        value: "test2",
-        votes: 10,
-      },
-    ],
-  },
-}: {
-  poll?: Poll | null;
-}) {
+function PollPage() {
+  const { id: link } = useParams();
+  const [poll, setPoll] = useState<Poll | null>(null);
+  const [voted, setVoted] = useState<string | null>(null);
+  const [hasViewed, setHasViewed] = useState(false);
+  useEffect(() => {
+    const fetchPoll = async () => {
+      try {
+        const pollData = await getPoll(link as string);
+        setPoll(pollData);
+
+        // Check if user has viewed this poll before
+        const viewKey = `poll_view_${link}`;
+        const hasViewedBefore = getLocalStorage(viewKey);
+
+        if (!hasViewedBefore) {
+          // Update view count in Firestore
+          await updatePollViews(link as string);
+          // Mark as viewed in localStorage
+          setLocalStorage(viewKey, "true");
+          setHasViewed(true);
+        }
+      } catch (error) {
+        // toast.error("No poll found");
+        // setTimeout(() => {
+        //   router.push("/404");
+        // }, 1000);
+      }
+    };
+
+    fetchPoll();
+  }, [link]);
+
+  useEffect(() => {
+    const voteKey = `poll_vote_${link}`;
+    const previousVote = getLocalStorage(voteKey);
+    if (previousVote) {
+      setVoted(JSON.parse(previousVote).value);
+    }
+  }, [link]);
+
+  const handleVote = async (value: string) => {
+    try {
+      const voteKey = `poll_vote_${link}`;
+      const previousVote = getLocalStorage(voteKey);
+
+      if (previousVote && JSON.parse(previousVote).value === value) {
+        toast.error("You have already voted for this option");
+        return;
+      }
+
+      toast.loading("Submitting vote...");
+      const result = await votePoll(
+        poll?.public_link as string,
+        value,
+        previousVote ? JSON.parse(previousVote).value : null
+      );
+
+      if (result) {
+        setPoll(result as Poll);
+        toast.dismiss();
+        toast.success("Vote submitted successfully");
+
+        // Store vote in localStorage
+        setLocalStorage(
+          voteKey,
+          JSON.stringify({
+            value,
+            timestamp: new Date().getTime(),
+          })
+        );
+        setVoted(value);
+      }
+    } catch (error) {
+      console.error("Error voting:", error);
+      toast.dismiss();
+      toast.error("Failed to submit vote");
+    }
+  };
+
   return (
     <div
       style={{
@@ -31,6 +97,7 @@ function PollPage({
       }}
       className="flex-1 flex flex-col gap-5 items-center p-6"
     >
+      <Toaster />
       <div className="flex items-center justify-center w-full gap-5">
         <h2 className="text-3xl text-center font-bold text-primary">
           {poll?.title}
@@ -68,27 +135,33 @@ function PollPage({
       <div className="flex items-center justify-center w-full gap-5">
         {poll?.updatedAt ? (
           <p className="text-sm text-slate-500">
-            Updated at {poll?.updatedAt.toLocaleString()}
+            Updated at {formatDate(poll.updatedAt) || "N/A"}
           </p>
         ) : (
           <p className="text-sm text-slate-500">
-            Created at {poll?.createdAt.toLocaleString()}
+            Created at {formatDate(poll?.createdAt || "") || "N/A"}
           </p>
         )}
       </div>
       <div className="flex flex-col items-center justify-center w-full gap-5">
-        {poll?.options.map((option, index) => (
-          <PollOptionItem
-            key={index}
-            option={option}
-            active={option.value === "test"}
-          />
-        ))}
+        {poll &&
+          poll?.options &&
+          poll?.options?.length > 0 &&
+          poll?.options.map((option, index) => (
+            <PollOptionItem
+              key={index}
+              option={option}
+              active={option.value === voted}
+              callback={handleVote}
+            />
+          ))}
       </div>
       <div className="flex items-center justify-center w-full gap-5">
         <h6 className="text-primary text-xl font-bold">Total votes</h6>
         <p className="text-primary text-xl font-bold">
-          {poll?.options.reduce((acc, curr) => acc + curr.votes, 0)}
+          {poll && poll?.options && poll?.options?.length > 0
+            ? poll?.options.reduce((acc, curr) => acc + curr.votes, 0)
+            : 0}
         </p>
       </div>
       <div className="flex items-center justify-center w-full gap-5">
