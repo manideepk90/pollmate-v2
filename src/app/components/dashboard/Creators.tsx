@@ -37,12 +37,14 @@ function Creators() {
         const usersRef = collection(db, "users");
         let q;
 
-        if (searchQuery.trim()) {
-          // If there's a search query, search by name without limit
+        const formattedSearchQuery = searchQuery.trim().toLowerCase();
+
+        if (formattedSearchQuery) {
+          // Search by name or email without limit
           q = query(
             usersRef,
-            where("name", ">=", searchQuery.toLowerCase()),
-            where("name", "<=", searchQuery.toLowerCase() + "\uf8ff")
+            where("name", ">=", formattedSearchQuery),
+            where("name", "<=", formattedSearchQuery + "\uf8ff")
           );
         } else {
           // If no search query, fetch only 10 users
@@ -61,8 +63,8 @@ function Creators() {
 
           fetchedCreators.push({
             id: doc.id,
-            name: userData.name || "Anonymous",
-            email: userData.email || "No email provided",
+            name: userData.name?.trim() || "Anonymous",
+            email: userData.email?.trim() || "No email provided",
             image: userData.image || "/assets/icons/user.svg",
             followers: userData.followers || 0,
             category: userData.category || "Uncategorized",

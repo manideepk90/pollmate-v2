@@ -5,6 +5,7 @@ import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/initFirebase";
 import { FaEye, FaVoteYea } from "react-icons/fa";
 import Link from "next/link";
+import { getUser } from "@/app/utils/auth";
 
 interface Poll {
   id: string;
@@ -40,7 +41,7 @@ function TrendingPolls() {
           getDocs(viewsQuery),
         ]);
 
-        const votedPolls = votesSnapshot.docs
+        const votedPollsPromise = votesSnapshot.docs
           .map((doc) => ({
             ...(doc.data() as Poll),
             id: doc.id,
@@ -53,14 +54,28 @@ function TrendingPolls() {
             ),
           }))
           .sort((a, b) => b.totalVotes - a.totalVotes)
-          .slice(0, 10);
-
-        console.log(votedPolls);
-
-        const viewedPolls = viewsSnapshot.docs.map((doc) => ({
-          ...(doc.data() as Poll),
-          id: doc.id,
-        })) as Poll[];
+          .slice(0, 10)
+          .map(async (poll) => {
+            const creator = await getUser(poll.createdBy);
+            return {
+              ...poll,
+              createdBy: creator?.name,
+            };
+          });
+        const votedPolls = await Promise.all(votedPollsPromise);
+        const viewedPollsPromise = viewsSnapshot.docs
+          .map((doc) => ({
+            ...(doc.data() as Poll),
+            id: doc.id,
+          }))
+          .map(async (poll) => {
+            const creator = await getUser(poll.createdBy);
+            return {
+              ...poll,
+              createdBy: creator?.name,
+            };
+          });
+        const viewedPolls = await Promise.all(viewedPollsPromise);
 
         setTopVotedPolls(votedPolls);
         setMostViewedPolls(viewedPolls);

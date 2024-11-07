@@ -103,22 +103,35 @@ function CreatorsPage() {
       try {
         setIsLoading(true);
         const usersRef = collection(db, "users");
-        let q;
+        let queries = [];
 
         if (searchQuery.trim()) {
-          // If there's a search query, search by name without limit
-          q = query(
-            usersRef,
-            where("name", ">=", searchQuery.toLowerCase()),
-            where("name", "<=", searchQuery.toLowerCase() + "\uf8ff"),
-            limit(userLimit)
+          // If there's a search query, search by name and email
+          const searchLower = searchQuery.toLowerCase();
+          queries.push(
+            query(
+              usersRef,
+              where("name", ">=", searchLower),
+              where("name", "<=", searchLower + "\uf8ff"),
+              limit(userLimit)
+            ),
+            query(
+              usersRef,
+              where("email", ">=", searchLower),
+              where("email", "<=", searchLower + "\uf8ff"),
+              limit(userLimit)
+            )
           );
         } else {
           // If no search query, fetch only 10 users
-          q = query(usersRef, limit(userLimit));
+          queries.push(query(usersRef, limit(userLimit)));
         }
 
-        const usersSnapshot = await getDocs(q);
+        const snapshots = await Promise.all(queries.map((q) => getDocs(q)));
+        const usersSnapshot = {
+          docs: snapshots.flatMap((snapshot) => snapshot.docs),
+        };
+
         const fetchedCreators: Creator[] = [];
         const uniqueCategories = new Set<string>(["All"]);
 
@@ -128,13 +141,11 @@ function CreatorsPage() {
             uniqueCategories.add(userData.category);
           }
           const pollsRef = collection(db, "polls");
-          let q = query(pollsRef, where("createdBy", "==", doc.id));
+          const q = query(pollsRef, where("createdBy", "==", doc.id));
           const pollsSnapshot = await getDocs(q);
-          let pollCount = pollsSnapshot.docs.length;
-          let pollViews = pollsSnapshot.docs.reduce(
-            (acc: number, poll: any) => {
-              return acc + poll.data().views;
-            },
+          const pollCount = pollsSnapshot.docs.length;
+          const pollViews = pollsSnapshot.docs.reduce(
+            (acc: number, poll: any) => acc + poll.data().views,
             0
           );
 
@@ -148,6 +159,7 @@ function CreatorsPage() {
             pollViews: pollViews || 0,
           });
         });
+
         await Promise.all(pollPromises);
         setCategories(Array.from(uniqueCategories));
         setCreators(
@@ -220,7 +232,7 @@ function CreatorsPage() {
           <div className=" flex gap-4">
             {categories.map((category) => (
               <CommonButton key={category}>{category}</CommonButton>
-            ))}{" "}
+            ))}
           </div>
         </div>
       </div>

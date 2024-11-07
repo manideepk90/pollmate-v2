@@ -18,4 +18,9 @@ export const checkAdminAccess = async () => {
     console.error("Error checking admin status:", error);
     return { isAuthorized: false, redirectTo: "/polls/my-polls" };
   }
-}; 
+};
+
+export const getUser = async (userId: string) => {
+  const userDoc = await getDoc(doc(db, "users", userId));
+  return userDoc.data();
+};
