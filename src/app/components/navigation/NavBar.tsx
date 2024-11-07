@@ -31,6 +31,7 @@ const NavBar: React.FC<{
       label: "Home",
       link: "/",
     },
+
     {
       label: "My polls",
       link: "/polls/my-polls",
@@ -273,20 +274,21 @@ const NavBar: React.FC<{
               })}
 
               {userData?.uid && (
-                <Link
-                  href="/polls/create"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="mt-4"
-                >
-                  <CommonButton style={{ width: "100%" }}>
-                    Create Poll
-                  </CommonButton>
-                </Link>
+                <div className="border-t border-gray-200 py-4">
+                  <Link
+                    href="/polls/create"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <CommonButton style={{ width: "100%" }}>
+                      Create Poll
+                    </CommonButton>
+                  </Link>
+                </div>
               )}
 
               {userData?.uid ? (
                 <>
-                  <div className="border-t border-gray-200 my-4 pt-4">
+                  <div className="border-t border-gray-200  py-4">
                     <div className="flex items-center gap-3 px-2 mb-4">
                       <div className="w-10 h-10 rounded-full bg-primary text-white grid place-items-center">
                         {userData.name?.[0].toUpperCase()}
@@ -312,7 +314,7 @@ const NavBar: React.FC<{
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="mt-4"
                 >
-                  <CommonButton className="w-full">Login</CommonButton>
+                  <CommonButton style={{ width: "100%" }}>Login</CommonButton>
                 </Link>
               )}
             </div>

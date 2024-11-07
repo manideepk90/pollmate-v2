@@ -10,7 +10,9 @@ interface Creator {
   reports?: number;
   pollsCount?: number;
   pollViews?: number;
-  id: string;
+  id?: string;
+  image?: string;
+  category?: string;
 }
 
 interface CreatorItemProps {
@@ -29,24 +31,47 @@ const CreatorsListItem: React.FC<CreatorItemProps> = ({ creator }) => {
         }}
         className="w-full h-full flex gap-4 border-gray-200 bg-white p-3 items-center justify-between md:flex-nowrap flex-wrap"
       >
-        <div className="">
-          <Link href={`/polls/${"123"}`}>
-            <h4 className="text-primary cursor-pointer font-bold text-2xl">
-              User name
-              {"  "}
-              <span className="text-sm text-red-500">10 reports</span>
-            </h4>
-          </Link>
-          <p className="text-sm text-gray-500">user@email.com</p>
+        <div className="flex gap-4">
+          <div className="w-12 h-12 rounded-full overflow-hidden">
+            <Link href={`/polls/${creator.id}`}>
+              <Image
+                src={creator.image || "/assets/images/avatar.svg"}
+                alt="creator"
+                width={100}
+                height={100}
+              />
+            </Link>
+          </div>
+          <div className="">
+            <Link href={`/polls/${creator.id}`}>
+              <h4 className="text-primary cursor-pointer font-bold text-md md:text-2xl hover:text-primary/80">
+                {creator.name}
+                {creator.reports && (
+                  <span className="text-sm text-red-500">
+                    {creator.reports} reports
+                  </span>
+                )}
+              </h4>
+            </Link>
+            <p className="text-sm text-gray-500">{creator.email}</p>
+          </div>
         </div>
-        <div className="flex md:flex-col gap-2 items-end md:items-start">
-          <p className="text-md text-primary text-end">10000 polls</p>
-          <p className="text-md text-primary text-end md:hidden">/</p>
-          <p className="text-xl text-primary text-end">11000 poll views</p>
+
+        <div className="flex gap-4">
+          <div className="flex md:flex-col gap-2 items-end md:items-start">
+            <p className="text-md text-primary text-end">
+              {creator.pollsCount} polls
+            </p>
+            <p className="text-md text-primary text-end md:hidden">/</p>
+            <p className="text-xl text-primary text-end">
+              {creator.pollViews} poll views
+            </p>
+          </div>
         </div>
+
         <div className="flex gap-6 justify-center">
           <div className="flex md:flex-col flex-row gap-2">
-            <Link href={`/dashboard/creators/${"123"}`}>
+            <Link href={`/dashboard/creators/${creator.id}`}>
               <CommonButton>view profile</CommonButton>
             </Link>
             <CommonButton variant="outline">block user</CommonButton>
@@ -81,6 +106,6 @@ const CreatorsListItem: React.FC<CreatorItemProps> = ({ creator }) => {
       </div>
     </div>
   );
-}
+};
 
 export default CreatorsListItem;

@@ -4,62 +4,90 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import CreatorsListItem from "./creatorsListItem";
 import CustomChart from "@/app/components/Chart/CustomChart";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "@/firebase/initFirebase";
 import toast from "react-hot-toast";
 import SearchComponent from "@/app/components/common/SearchComponent";
 
 interface Creator {
-  uid: string;
   name: string;
   email: string;
-  image: string | null;
-  stats?: {
-    totalPolls: number;
-    totalViews: number;
-    totalVotes: number;
-  };
-  isBlocked?: boolean;
+  reports?: number;
+  pollsCount?: number;
+  pollViews?: number;
+  id?: string;
+  image?: string;
+  category?: string;
 }
 
 interface ChartDataItem {
   [key: string]: string | number;
   name: string;
   value: number;
-  views: number;
-  votes: number;
 }
+const userLimit = 10;
+const viewLimit = 5;
 
 function CreatorsPage() {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<string[]>(["All"]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [chartPollData, setChartPollData] = useState<ChartDataItem[]>([]);
+  const [chartVoteData, setChartVoteData] = useState<ChartDataItem[]>([]);
 
   useEffect(() => {
-    const fetchCreators = async () => {
+    const fetchCreatorsAnalytics = async () => {
       try {
         setLoading(true);
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("isAdmin", "==", false));
-        const querySnapshot = await getDocs(q);
-        
-        const creatorsData = querySnapshot.docs.map(doc => ({
-          uid: doc.id,
-          ...doc.data()
-        })) as Creator[];
+        const pollsRef = collection(db, "polls");
+        const pollsQuery = query(
+          pollsRef,
+          orderBy("views", "desc"),
+          limit(viewLimit)
+        );
+        const pollsSnapshot = await getDocs(pollsQuery);
 
-        setCreators(creatorsData);
-
-        // Prepare chart data
-        const chartData = creatorsData.slice(0, 5).map(creator => ({
-          name: creator.name,
-          value: creator.stats?.totalPolls || 10,
-          views: creator.stats?.totalViews || 9,
-          votes: creator.stats?.totalVotes || 6,
+        const fetchedPolls = pollsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as { createdBy: string }),
         }));
-        setChartData(chartData);
+        let chartPollData: ChartDataItem[] = [];
+        let chartVotesData: ChartDataItem[] = [];
+        const pollPromises = fetchedPolls.map(async (poll: any) => {
+          const userRef = doc(db, "users", poll.createdBy);
+          const userDoc = await getDoc(userRef);
+          const userData = userDoc.data();
+          let creator: Creator = {
+            name: userData?.name,
+            email: userData?.email,
+          };
 
+          chartPollData.push({
+            name: creator.name,
+            value: poll.views,
+          });
+          chartVotesData.push({
+            name: creator.name,
+            value: poll.options.reduce((acc: number, option: any) => {
+              return acc + option.votes;
+            }, 0),
+          });
+        });
+
+        await Promise.all(pollPromises);
+        setChartPollData(chartPollData);
+        setChartVoteData(chartVotesData);
       } catch (error) {
         console.error("Error fetching creators:", error);
         toast.error("Failed to load creators");
@@ -68,58 +96,148 @@ function CreatorsPage() {
       }
     };
 
-    fetchCreators();
+    fetchCreatorsAnalytics();
   }, []);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setIsLoading(true);
+        const usersRef = collection(db, "users");
+        let q;
 
-  const filteredCreators = creators.filter(creator => 
-    creator.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    creator.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        if (searchQuery.trim()) {
+          // If there's a search query, search by name without limit
+          q = query(
+            usersRef,
+            where("name", ">=", searchQuery.toLowerCase()),
+            where("name", "<=", searchQuery.toLowerCase() + "\uf8ff"),
+            limit(userLimit)
+          );
+        } else {
+          // If no search query, fetch only 10 users
+          q = query(usersRef, limit(userLimit));
+        }
+
+        const usersSnapshot = await getDocs(q);
+        const fetchedCreators: Creator[] = [];
+        const uniqueCategories = new Set<string>(["All"]);
+
+        const pollPromises = usersSnapshot.docs.map(async (doc) => {
+          const userData = doc.data();
+          if (userData.category) {
+            uniqueCategories.add(userData.category);
+          }
+          const pollsRef = collection(db, "polls");
+          let q = query(pollsRef, where("createdBy", "==", doc.id));
+          const pollsSnapshot = await getDocs(q);
+          let pollCount = pollsSnapshot.docs.length;
+          let pollViews = pollsSnapshot.docs.reduce(
+            (acc: number, poll: any) => {
+              return acc + poll.data().views;
+            },
+            0
+          );
+
+          fetchedCreators.push({
+            id: doc.id,
+            name: userData.name || "Anonymous",
+            email: userData.email || "No email provided",
+            image: userData.image || "/assets/icons/user.svg",
+            category: userData.category || "Uncategorized",
+            pollsCount: pollCount || 0,
+            pollViews: pollViews || 0,
+          });
+        });
+        await Promise.all(pollPromises);
+        setCategories(Array.from(uniqueCategories));
+        setCreators(
+          fetchedCreators.sort(
+            (a, b) => (b.pollViews || 0) - (a.pollViews || 0)
+          )
+        );
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [searchQuery]);
+
+  const filteredCreators = creators.filter(
+    (creator) =>
+      creator.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      creator.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
-    return <div className="w-full h-full grid place-items-center">Loading...</div>;
+    return (
+      <div className="w-full h-full grid place-items-center">Loading...</div>
+    );
   }
 
   return (
     <section className="w-full h-full flex flex-col justify-center gap-4 py-16 px-6">
       <div className="w-full h-full flex justify-between items-center">
         <h1 className="text-primary text-3xl font-bold">Creators</h1>
-        <Link href="/dashboard/creators/reports">
+        {/* <Link href="/dashboard/creators/reports">
           <CommonButton
             style={{ padding: "10px 26px", borderRadius: "10px" }}
             className="text-primary"
           >
             View Reports
           </CommonButton>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Analytics Chart */}
-      <div className="w-full h-[300px]">
-        <CustomChart data={chartData} />
+      <div className="w-full flex flex-col gap-6">
+        <h3 className="text-primary text-2xl font-bold">Top 5 Poll Views</h3>
+        <div className="w-full h-[330px]">
+          <CustomChart data={chartPollData} />
+        </div>
+        <h3 className="text-primary text-2xl font-bold">Top 5 Poll Votes</h3>
+        <div className="w-full h-[330px]">
+          <CustomChart data={chartVoteData} />
+        </div>
       </div>
 
       {/* Search and List Section */}
-      <div className="w-full h-full flex flex-col md:flex-row justify-between gap-4 py-10">
-        <h3 className="text-primary text-2xl font-bold">Creators List</h3>
-        <SearchComponent
-          placeholder="Search creators..."
-        />
+      <div className="w-full h-full flex flex-col md:flex-row  justify-between gap-4 py-10">
+        <h3 className="text-primary text-2xl font-bold flex flex-col gap-2">
+          <span>Creators List</span>
+          <span className="text-sm text-gray-500">
+            View all creators and their analytics
+          </span>
+        </h3>
+        <div className="flex flex-1 gap-4 items-center md:justify-end">
+          <SearchComponent
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search creators..."
+          />
+          <div className=" flex gap-4">
+            {categories.map((category) => (
+              <CommonButton key={category}>{category}</CommonButton>
+            ))}{" "}
+          </div>
+        </div>
       </div>
 
       {/* Creators List */}
-      {/* <div className="w-full h-full flex gap-4 flex-col">
+      <div className="w-full h-full flex gap-4 flex-col">
         {filteredCreators.length === 0 ? (
           <div className="text-center text-gray-500">No creators found</div>
         ) : (
           filteredCreators.map((creator) => (
-            <CreatorsListItem key={creator.uid} creator={creator} />
+            <CreatorsListItem key={creator.id} creator={creator} />
           ))
         )}
-      </div> */}
+      </div>
 
       {/* View More Button */}
-      {filteredCreators.length > 10 && (
+      {filteredCreators.length > userLimit && (
         <div className="w-full h-full flex justify-center">
           <Link href="/dashboard/creators/all">
             <CommonButton
