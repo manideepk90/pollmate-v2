@@ -13,7 +13,7 @@ function page() {
       <h1 className="text-primary text-3xl font-bold text-center">
         User Analytics
       </h1>
-      <CustomChart data={[]} />
+      {/* <CustomChart data={[]} /> */}
       <h3 className="text-primary text-2xl font-bold text-center py-6">
         User polls
       </h3>

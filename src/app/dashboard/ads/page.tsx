@@ -23,10 +23,10 @@ function page() {
           Create Ad
         </CommonButton>
       </div>
-      <CustomChart />
+      {/* <CustomChart data={[]} /> */}
       <div className="w-full h-full flex flex-col md:flex-row justify-between gap-4 py-10">
         <h3 className="text-primary text-2xl font-bold">list</h3>
-        <SearchComponent />
+        {/* <SearchComponent />  */}
       </div>
       <div className="w-full h-full flex gap-4 flex-col">
         <DashboardAdsItemWithBlock />

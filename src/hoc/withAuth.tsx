@@ -4,7 +4,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase/initFirebase";
 
 const withAuth = (WrappedComponent: React.ComponentType) => {
-  const AuthenticatedComponent = (props: any) => {
+  const AuthenticatedComponent = (props: React.ComponentProps<typeof WrappedComponent>) => {
     const [isRedirecting, setIsRedirecting] = useState(false);
     const router = useRouter();
     const pathname = usePathname();

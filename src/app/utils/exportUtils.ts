@@ -3,7 +3,10 @@ import { formatDate } from "./dateUtils";
 
 export const exportPollToCSV = (
   poll: Poll,
-  sortedOptions: any,
+  sortedOptions: {
+    value: string;
+    votes: number;
+  }[],
   totalVotes: number
 ) => {
   // Poll metadata
@@ -19,7 +22,10 @@ export const exportPollToCSV = (
 
   // Results headers and data
   const headers = "Rank,Option,Votes,Percentage";
-  const rows = sortedOptions.map((option: any, index: number) => {
+  const rows = sortedOptions.map((option: {
+    value: string;
+    votes: number;
+  }, index: number) => {
     const percentage =
       totalVotes > 0
         ? (((option.votes || 0) / totalVotes) * 100).toFixed(1)

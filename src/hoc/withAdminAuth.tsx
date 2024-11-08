@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { checkAdminAccess } from "@/app/utils/auth";
 
 export default function withAdminAuth(WrappedComponent: React.ComponentType) {
-  return function WithAdminAuthWrapper(props: any) {
+  return function WithAdminAuthWrapper(props: React.ComponentProps<typeof WrappedComponent>) {
     const router = useRouter();
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [loading, setLoading] = useState(true);

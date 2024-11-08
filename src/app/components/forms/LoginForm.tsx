@@ -110,7 +110,7 @@ function LoginForm() {
         <p className="text-sm text-gray-500">----------or----------</p>
         <GoogleLoginProvider />
         <p className="text-sm text-gray-500">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
             className="text-blue-500"
             href={"/register?returnUrl=" + returnUrl}

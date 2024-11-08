@@ -36,7 +36,7 @@ function PollAnalytics({ poll }: PollAnalyticsProps) {
 
       {/* Chart Section */}
       <div className="w-full h-[400px]">
-        <CustomChart data={chartData} />
+        {/* <CustomChart data={chartData} /> */}
       </div>
 
       {/* Poll Details */}

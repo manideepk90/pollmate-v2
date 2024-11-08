@@ -1,6 +1,5 @@
 import React from "react";
 import NavBar from "../components/navigation/NavBar";
-import { AuthProvider } from "../context/AuthContext";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -2,20 +2,16 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import Logo from "../common/logo";
 import CommonButton from "../buttons/CommonButton";
-import SearchComponent from "../common/SearchComponent";
+
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/app/context/AuthContext";
 import clsx from "clsx";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase/initFirebase";
+
 import { checkAdminAccess } from "@/app/utils/auth";
 
 const NavBar: React.FC<{
-  variant?: "default" | "polls" | "polls-create";
-  isSearchable?: boolean;
-  searchCallback?: () => void;
   menuItems?: {
     label: string;
     link: string;
@@ -23,9 +19,6 @@ const NavBar: React.FC<{
   }[];
   isSticky?: boolean;
 }> = ({
-  variant = "default",
-  isSearchable = true,
-  searchCallback,
   menuItems = [
     {
       label: "Home",

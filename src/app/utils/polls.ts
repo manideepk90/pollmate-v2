@@ -15,7 +15,7 @@ import {
 import { db } from "@/firebase/initFirebase";
 import toast from "react-hot-toast";
 
-const getPolls = async (limitCount: number, lastVisible: any = null) => {
+const getPolls = async (limitCount: number, lastVisible: Poll | null = null) => {
   const pollsRef = collection(db, "polls");
   let q = query(
     pollsRef,

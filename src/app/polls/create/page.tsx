@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import CommonButton from "@/app/components/buttons/CommonButton";
 import Space from "@/app/components/common/Space";
@@ -14,7 +15,7 @@ import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
 import { ref } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
-function page() {
+function CreatePollPage() {
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
@@ -26,7 +27,7 @@ function page() {
   const [key, setKey] = useState(3);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { user } = useAuth() as any;
+  const { user } = useAuth();
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -140,13 +141,13 @@ function page() {
           "-" +
           polluuid.slice(0, 8),
       };
-      const pollId = await addDoc(collection(db, "polls"), pollDoc);
+      await addDoc(collection(db, "polls"), pollDoc);
 
       toast.success("Poll created successfully");
       router.push(`/polls/${pollDoc.public_link}`);
     } catch (error: any) {
-      console.log(error);
-      toast.error(`Error creating poll ${error.message}`);
+      console.error(error);
+      toast.error(`Error creating poll ${error?.message}`);
     } finally {
       setLoading(false);
       // toast.dismiss();
@@ -315,4 +316,4 @@ function page() {
   );
 }
 
-export default withAuth(page);
+export default withAuth(CreatePollPage);

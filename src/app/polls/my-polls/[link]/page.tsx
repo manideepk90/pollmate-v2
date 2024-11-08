@@ -16,6 +16,7 @@ function PollAnalyticsPage() {
         const pollData = await getPoll(link as string);
         setPoll(pollData);
       } catch (error) {
+        console.error(error);
         toast.error("Failed to load poll");
       } finally {
         setLoading(false);
