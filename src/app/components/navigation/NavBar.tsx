@@ -167,27 +167,26 @@ const NavBar: React.FC<{
                   height={30}
                   className="rounded-full object-cover"
                 />
+              ) : userData?.name ? (
+                userData.name[0].toUpperCase()
               ) : (
-                <div
-                  onClick={() =>
-                    userData?.uid ? setIsMenuOpen(true) : router.push("/login")
-                  }
-                  className={clsx(
-                    "w-[30px] h-[30px] rounded-full border border-gray-300 text-white grid place-items-center cursor-pointer",
-                    userData?.name ? "bg-primary" : "bg-white"
-                  )}
+                // <div
+                //   onClick={() =>
+                //     userData?.uid ? setIsMenuOpen(true) : router.push("/login")
+                //   }
+                //   className={clsx(
+                //     "w-[30px] h-[30px] rounded-full border border-gray-300 text-white grid place-items-center cursor-pointer",
+                //     userData?.name ? "bg-primary" : "bg-white"
+                //   )}
+                // >
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="mt-4"
                 >
-                  {userData?.name ? (
-                    userData.name[0].toUpperCase()
-                  ) : (
-                    <Image
-                      src="/assets/icons/user.svg"
-                      alt="user"
-                      width={20}
-                      height={20}
-                    />
-                  )}
-                </div>
+                  <CommonButton style={{ width: "100%" }}>Login</CommonButton>
+                </Link>
+                // </div>
               )}
 
               {/* User Menu Dropdown */}

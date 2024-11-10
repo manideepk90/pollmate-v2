@@ -116,6 +116,7 @@ function CreatePollPage() {
     try {
       const polluuid = uuidv4();
       const pollDoc = {
+        uid: polluuid,
         createdBy: user.uid,
         createdAt: new Date().toISOString(),
         updatedAt: null,

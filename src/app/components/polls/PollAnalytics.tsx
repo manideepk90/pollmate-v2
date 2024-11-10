@@ -1,16 +1,27 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CustomChart from "../Chart/CustomChart";
 import Image from "next/image";
 import { formatDate } from "@/app/utils/dateUtils";
 import { formatNumber } from "@/app/utils/numberUtils";
 import { exportPollToCSV } from "@/app/utils/exportUtils";
-
+import AdComponent from "../Ads/AdComponent";
+import { getReports } from "@/app/utils/polls";
+import CommonButton from "../buttons/CommonButton";
+import ShareModal from "../Share/ShareModal";
 interface PollAnalyticsProps {
   poll: Poll;
 }
 
+interface Report {
+  email: string;
+  description: string;
+}
+
 function PollAnalytics({ poll }: PollAnalyticsProps) {
+  const [reports, setReports] = useState<Report[]>([]);
+
+  const [shareModal, setShareModal] = useState(false);
   const { sortedOptions, totalVotes } = useMemo(() => {
     const sorted = [...poll.options].sort(
       (a, b) => (b.votes || 0) - (a.votes || 0)
@@ -18,6 +29,14 @@ function PollAnalytics({ poll }: PollAnalyticsProps) {
     const total = sorted.reduce((sum, opt) => sum + (opt.votes || 0), 0);
     return { sortedOptions: sorted, totalVotes: total };
   }, [poll.options]);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      const reports = await getReports(poll.uid as string);
+      setReports(reports as Report[]);
+    };
+    fetchReports();
+  }, [poll.uid]);
 
   const chartData = sortedOptions.map((option) => ({
     name: option.value,
@@ -36,14 +55,22 @@ function PollAnalytics({ poll }: PollAnalyticsProps) {
 
       {/* Chart Section */}
       <div className="w-full h-[400px]">
-        {/* <CustomChart data={chartData} /> */}
+        <CustomChart data={chartData} />
       </div>
+      <ShareModal
+        poll={poll}
+        isOpen={shareModal}
+        onClose={() => setShareModal(false)}
+      />
 
       {/* Poll Details */}
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-4">
           <h3 className="text-primary text-2xl font-bold">{poll.title}</h3>
           <p className="text-gray-600">{poll.description}</p>
+          <CommonButton callback={() => setShareModal(true)}>
+            Share poll
+          </CommonButton>
           <div className="space-y-2">
             <p className="text-primary">
               <span className="font-bold">{formatNumber(poll.views || 0)}</span>{" "}
@@ -123,6 +150,29 @@ function PollAnalytics({ poll }: PollAnalyticsProps) {
           </tbody>
         </table>
       </div>
+      <AdComponent />
+      {poll?.reportCount && (
+        <div className="flex flex-col gap-2">
+          <h3 className="text-primary text-2xl font-bold">Reports</h3>
+          <p className="text-gray-600">{poll.reportCount} reports</p>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="p-4">Reported By</th>
+                <th className="p-4">Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.map((report, index) => (
+                <tr key={index} className="border-b">
+                  <td className="p-4">{report?.email}</td>
+                  <td className="p-4">{report?.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </section>
   );
 }

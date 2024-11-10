@@ -165,9 +165,11 @@ function HomePage() {
           </h3>
         </div>
         <div className="w-full h-full flex items-center justify-center flex-col gap-7">
-          <CommonButton className="px-6 py-3 rounded-full">
-            Get started
-          </CommonButton>
+          <Link href="/polls/create">
+            <CommonButton className="px-6 py-3 rounded-full">
+              Get started
+            </CommonButton>
+          </Link>
         </div>
       </section>
       <section className="w-full h-full flex items-center justify-center py-10 md:py-24 px-10 gap-10 border-t border-gray-200 animate-dropIn">
@@ -178,7 +180,10 @@ function HomePage() {
             <span className="text-primary">Poll</span>
             <span className="text-secondary">mate</span>. All rights reserved.
           </p>
-          <p className="text-gray-500 text-sm">
+          <Link href="/privacy-policy">Privacy Policy</Link>
+          <Link href="/terms-and-conditions">Terms of Service</Link>
+
+          {/* <p className="text-gray-500 text-sm">
             made with <span className="text-primary">❤️</span> by{" "}
             <Link
               href="https://github.com/manideepk90"
@@ -187,7 +192,7 @@ function HomePage() {
             >
               manideepk90
             </Link>
-          </p>
+          </p> */}
         </div>
       </section>
     </main>

@@ -15,6 +15,8 @@ interface PollListItemProps {
 }
 
 import { exportPollToCSV } from "@/app/utils/exportUtils";
+import { useAuth } from "@/app/context/AuthContext";
+import ShareModal from "../Share/ShareModal";
 
 function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -22,6 +24,8 @@ function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [publicLink, setPublicLink] = useState(poll?.public_link || "");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const { user } = useAuth();
 
   const { topOptions, othersVotes, totalVotes } = useMemo(() => {
     if (!poll?.options?.length) {
@@ -120,6 +124,11 @@ function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
     }
   };
 
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsShareModalOpen(true);
+  };
+
   return (
     <div
       style={{ background: "var(--linear)", padding: "1px" }}
@@ -128,12 +137,27 @@ function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
       <div className="w-full h-full rounded-md bg-white p-4 flex gap-4 items-center">
         {/* Title and Description */}
         <div className="flex-1">
-          <Link href={`/polls/my-polls/${poll?.public_link}`}>
-            <h4 className="text-primary cursor-pointer font-semibold hover:underline">
-              {poll?.title}
-            </h4>
-          </Link>
-          <p className="text-sm text-gray-500 mt-1">{poll?.description}</p>
+          <div className="flex flex-col md:flex-row gap-2 items-start">
+            <Link href={`/polls/my-polls/${poll?.public_link}`}>
+              <h4 className="text-primary cursor-pointer font-semibold hover:underline">
+                {poll?.title && poll?.title.slice(0, 30)}
+                {poll?.title && poll?.title.length > 30 && "..."}
+              </h4>
+            </Link>
+            {poll?.reportCount && (
+              <p className="text-sm text-red-500 self-end">
+                {poll?.reportCount === 1
+                  ? "1 report"
+                  : `${poll?.reportCount} reports`}
+              </p>
+            )}
+          </div>
+          {poll?.description && (
+            <p className="text-sm text-gray-500 mt-1">
+              {poll?.description && poll?.description.slice(0, 100)}
+              {poll?.description && poll?.description.length > 100 && "..."}
+            </p>
+          )}
         </div>
 
         {/* Votes Distribution */}
@@ -189,10 +213,7 @@ function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
           <div className="flex md:flex-row flex-col gap-4">
             <button
               className="hover:opacity-70 transition-opacity"
-              onClick={(e) => {
-                e.preventDefault();
-                // Handle share logic
-              }}
+              onClick={handleShareClick}
             >
               <Image
                 src="/assets/icons/share.svg"
@@ -306,6 +327,12 @@ function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
           </div>
         </div>
       </Dialog>
+
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        poll={poll}
+      />
     </div>
   );
 }

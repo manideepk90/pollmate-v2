@@ -6,13 +6,14 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 function PollAnalyticsPage() {
-  const { link } = useParams();
+  const link = useParams()?.link as string;
   const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPoll = async () => {
       try {
+        if (!link) return;
         const pollData = await getPoll(link as string);
         setPoll(pollData);
       } catch (error) {

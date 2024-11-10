@@ -1,7 +1,10 @@
+"use client";
 import type { Metadata } from "next";
 import "./globals.css";
 import { DM_Sans } from "next/font/google";
 import { AuthProvider } from "./context/AuthContext";
+import Clarity from "@microsoft/clarity";
+import { useEffect } from "react";
 
 const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
@@ -16,11 +19,27 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const clarityId = "owidwjugki";
+  useEffect(() => {
+    Clarity.init(clarityId);
+  }, []);
+
   return (
     <html lang="en">
+      <head>
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        {/* Add any default meta tags here */}
+
+        {/* <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClientId}`}
+          crossOrigin="anonymous"
+        /> */}
+      </head>
       <body
         className={`${dmSans.className} antialiased max-w-screen-xl flex flex-col items-center mx-auto w-full`}
       >

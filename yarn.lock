@@ -637,6 +637,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@microsoft/clarity@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/clarity/-/clarity-1.0.0.tgz#e5f6c87d4aac9bac0cedeaa94158a3fd32fbcd5e"
+  integrity sha512-2QY6SmXnqRj6dWhNY8NYCN3e53j4zCFebH4wGnNhdGV1mqAsQwql2fT0w8TISxCvwwfVp8idsWLIdrRHOms1PQ==
+
 "@next/env@15.0.2":
   version "15.0.2"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-15.0.2.tgz#4e921af3faf8a16c6be98ec6a81a32a40050a8b7"
@@ -2858,8 +2863,9 @@ pirates@^4.0.1:
     file-saver "^2.0.5"
     firebase "^11.0.1"
     next "15.0.2"
-    pollmate-v2 "file:C:/Users/manid/AppData/Local/Yarn/Cache/v6/npm-pollmate-v2-0.1.0-5b46878d-ab0c-48d5-90a3-07c7522133f3-1730922134647/node_modules/pollmate-v2"
+    pollmate-v2 "file:C:/Users/manid/AppData/Local/Yarn/Cache/v6/npm-pollmate-v2-0.1.0-769ab72e-d877-4a64-a5de-916168b4a89c-1731264859464/node_modules/pollmate-v2"
     react "19.0.0-rc-02c0e824-20241028"
+    react-adsense "^0.1.0"
     react-dom "19.0.0-rc-02c0e824-20241028"
     react-hot-toast "^2.4.1"
     react-icons "^4.10.1"
@@ -2974,6 +2980,11 @@ queue-microtask@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
+
+react-adsense@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/react-adsense/-/react-adsense-0.1.0.tgz#f170007a9ab05ee2cd1c915cdc9788624658e3c1"
+  integrity sha512-VzGMH9qA7bBKAveK1joFWphhB7e2Y1ToSGzUa8b7eit3+VSkg/2MSvKxe5d/r4mcmkOHu6CHNJW0nn6RQC3IZA==
 
 react-dom@19.0.0-rc-02c0e824-20241028:
   version "19.0.0-rc-02c0e824-20241028"

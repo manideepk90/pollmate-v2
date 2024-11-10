@@ -49,7 +49,7 @@ function PollList({ isStraight = false }: { isStraight?: boolean }) {
 
   useEffect(() => {
     fetchPolls(true);
-  }, [fetchPolls]);
+  }, []);
 
   if (error) {
     return <div className="w-full text-red-500 text-center py-4">{error}</div>;
@@ -57,20 +57,20 @@ function PollList({ isStraight = false }: { isStraight?: boolean }) {
 
   return (
     <div className="w-full flex flex-col gap-6">
-      <div
-        className="poll-list grid w-full gap-10 justify-center items-center"
-        data-isstraight={isStraight}
-      >
-        {polls && polls.length > 0 ? (
-          polls.map((poll) => (
+      {polls && polls.length > 0 ? (
+        <div
+          className="poll-list grid w-full gap-10 justify-center items-center"
+          data-isstraight={isStraight}
+        >
+          {polls.map((poll) => (
             <PollItem key={poll.id || poll.public_link} poll={poll} />
-          ))
-        ) : !loading ? (
-          <div className="w-full font-bold flex justify-center items-center flex-1">
-            No polls found
-          </div>
-        ) : null}
-      </div>
+          ))}
+        </div>
+      ) : !loading ? (
+        <div className="w-full font-bold flex justify-center items-center text-gray-500 text-center">
+          No polls found
+        </div>
+      ) : null}
 
       {hasMore && !loading && (
         <div className="w-full flex justify-center">
