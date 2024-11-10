@@ -1,10 +1,7 @@
-"use client";
 import type { Metadata } from "next";
 import "./globals.css";
 import { DM_Sans } from "next/font/google";
 import { AuthProvider } from "./context/AuthContext";
-import Clarity from "@microsoft/clarity";
-import { useEffect } from "react";
 
 const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
@@ -22,11 +19,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const clarityId = "owidwjugki";
-  useEffect(() => {
-    Clarity.init(clarityId);
-  }, []);
-
   return (
     <html lang="en">
       <head>
@@ -39,6 +31,17 @@ export default function RootLayout({
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClientId}`}
           crossOrigin="anonymous"
         /> */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+"${process.env.NEXT_PUBLIC_CLARITY_ID}";
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
+            `,
+          }}
+        />
       </head>
       <body
         className={`${dmSans.className} antialiased max-w-screen-xl flex flex-col items-center mx-auto w-full`}
