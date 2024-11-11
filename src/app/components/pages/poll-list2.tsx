@@ -17,6 +17,7 @@ interface PollListItemProps {
 import { exportPollToCSV } from "@/app/utils/exportUtils";
 import { useAuth } from "@/app/context/AuthContext";
 import ShareModal from "../Share/ShareModal";
+import { FaBan } from "react-icons/fa";
 
 function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -150,6 +151,12 @@ function PollListItem({ poll, onPollUpdated }: PollListItemProps) {
                   ? "1 report"
                   : `${poll?.reportCount} reports`}
               </p>
+            )}
+            {poll?.isBlocked && (
+              <div className="flex items-center gap-1">
+                <FaBan className="text-red-500" />
+                <p className="text-sm text-red-500 self-end"> Blocked</p>
+              </div>
             )}
           </div>
           {poll?.description && (

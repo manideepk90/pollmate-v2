@@ -113,7 +113,7 @@ function LoginForm() {
           Don&apos;t have an account?{" "}
           <Link
             className="text-blue-500"
-            href={"/register?returnUrl=" + returnUrl}
+            href={`/register${returnUrl ? `?returnUrl=${returnUrl}` : ""}`}
           >
             Register
           </Link>

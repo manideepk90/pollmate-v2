@@ -4,6 +4,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { FaFacebook, FaWhatsapp } from "react-icons/fa";
+import Link from "next/link";
 
 function ShareModal({
   isOpen,
@@ -79,7 +80,9 @@ function ShareModal({
           <div className="flex gap-2">
             <input
               type="text"
-              value={`${window.location.origin}/polls/${poll?.public_link}?sharedBy=${user?.uid}`}
+              value={`${window.location.origin}/polls/${poll?.public_link}${
+                user?.uid ? `?sharedBy=${user?.uid}` : ""
+              }`}
               readOnly
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             />
@@ -92,6 +95,16 @@ function ShareModal({
           </div>
         </div>
         <div className="flex gap-4 justify-center mt-6">
+          <Link
+            href={`${window.location.origin}/polls/${poll?.public_link}${
+              user?.uid ? `?sharedBy=${user?.uid}` : ""
+            }`}
+            target="_blank"
+          >
+            <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/80">
+              open
+            </button>
+          </Link>
           <button
             onClick={() => handleSocialShare("whatsapp")}
             className="p-3 rounded-full bg-green-500 hover:bg-green-600 text-white"
@@ -102,7 +115,7 @@ function ShareModal({
             onClick={() => handleSocialShare("facebook")}
             className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white"
           >
-                <FaFacebook />
+            <FaFacebook />
           </button>
         </div>
       </div>

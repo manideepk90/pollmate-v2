@@ -39,10 +39,8 @@ const GoogleLoginProvider = () => {
     });
   };
 
-
   const handleSignin = async (providerName: string) => {
     if (providerName === "google") {
-      
       const provider = new GoogleAuthProvider();
       try {
         const result = await signInWithPopup(auth, provider);

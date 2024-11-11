@@ -6,6 +6,7 @@ import { db } from "@/firebase/initFirebase";
 import { FaEye, FaVoteYea } from "react-icons/fa";
 import Link from "next/link";
 import { getUser } from "@/app/utils/auth";
+import CommonButton from "../buttons/CommonButton";
 
 interface Poll {
   id: string;
@@ -187,6 +188,11 @@ function TrendingPolls() {
           </h2>
         </div>
         <PollTable polls={mostViewedPolls} type="views" />
+      </div>
+      <div className="flex items-center gap-2">
+        <Link href="/dashboard/polls">
+          <CommonButton>View All Polls</CommonButton>
+        </Link>
       </div>
     </div>
   );

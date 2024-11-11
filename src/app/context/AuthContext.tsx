@@ -1,16 +1,22 @@
 "use client";
-import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "@/firebase/initFirebase";
-import { 
-  getFirestore, 
-  doc, 
-  getDoc, 
-  updateDoc, 
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
   collection,
   query,
   where,
-  getDocs
+  getDocs,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -23,7 +29,7 @@ interface UserData {
   createdAt: Date;
   updatedAt: Date;
   isAdmin: boolean;
-  status: 'online' | 'offline';
+  status: "online" | "offline";
   lastActive: Date;
   loginTimestamp: number;
   polls?: Poll[];
@@ -52,9 +58,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const pollsRef = collection(db, "polls");
       const q = query(pollsRef, where("createdBy", "==", userId));
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
+      return querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       })) as Poll[];
     } catch (error) {
       console.error("Error fetching user polls:", error);
@@ -62,43 +68,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  const fetchUserData = useCallback(async (userId: string) => {
-    try {
-      const userDocRef = doc(db, "users", userId);
-      const docSnap = await getDoc(userDocRef);
-      
-      if (docSnap.exists()) {
-        const userData = docSnap.data() as UserData;
-        const userPolls = await fetchUserPolls(userId);
-        setUserData({ ...userData, polls: userPolls });
-      } else {
-        console.error("No user data found!");
-        setUserData(null);
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      toast.error("Failed to fetch user data");
-    }
-  }, [fetchUserPolls]);
+  const fetchUserData = useCallback(
+    async (userId: string) => {
+      try {
+        const userDocRef = doc(db, "users", userId);
+        const docSnap = await getDoc(userDocRef);
 
-  const updateUserStatus = useCallback(async (userId: string, status: 'online' | 'offline') => {
-    try {
-      const userDocRef = doc(db, "users", userId);
-      await updateDoc(userDocRef, {
-        status,
-        lastActive: new Date(),
-        loginTimestamp: new Date().getTime(),
-      });
-    } catch (error) {
-      console.error("Error updating user status:", error);
-    }
-  }, []);
+        if (docSnap.exists()) {
+          const userData = docSnap.data() as UserData;
+          const userPolls = await fetchUserPolls(userId);
+          setUserData({ ...userData, polls: userPolls });
+        } else {
+          console.error("No user data found!");
+          setUserData(null);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        toast.error("Failed to fetch user data");
+      }
+    },
+    [fetchUserPolls]
+  );
+
+  const updateUserStatus = useCallback(
+    async (userId: string, status: "online" | "offline") => {
+      try {
+        const userDocRef = doc(db, "users", userId);
+        await updateDoc(userDocRef, {
+          status,
+          lastActive: new Date(),
+          loginTimestamp: new Date().getTime(),
+        });
+      } catch (error) {
+        console.error("Error updating user status:", error);
+      }
+    },
+    []
+  );
 
   const checkAutoLogout = useCallback(async (userId: string) => {
     try {
       const userDocRef = doc(db, "users", userId);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const { loginTimestamp } = docSnap.data();
         if (new Date().getTime() - loginTimestamp > THIRTY_DAYS_MS) {
@@ -117,22 +129,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [user?.uid, fetchUserData]);
 
-  const updateUserProfile = useCallback(async (data: Partial<UserData>) => {
-    if (!user?.uid) return;
+  const updateUserProfile = useCallback(
+    async (data: Partial<UserData>) => {
+      if (!user?.uid) return;
 
-    try {
-      const userDocRef = doc(db, "users", user.uid);
-      await updateDoc(userDocRef, {
-        ...data,
-        updatedAt: new Date()
-      });
-      await refreshUserData();
-      toast.success("Profile updated successfully");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile");
-    }
-  }, [user?.uid, refreshUserData]);
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        await updateDoc(userDocRef, {
+          ...data,
+          updatedAt: new Date(),
+        });
+        await refreshUserData();
+        toast.success("Profile updated successfully");
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        toast.error("Failed to update profile");
+      }
+    },
+    [user?.uid, refreshUserData]
+  );
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -142,7 +157,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(currentUser);
           await checkAutoLogout(currentUser.uid);
           await fetchUserData(currentUser.uid);
-          await updateUserStatus(currentUser.uid, 'online');
+          await updateUserStatus(currentUser.uid, "online");
         } else {
           setUser(null);
           setUserData(null);
@@ -157,7 +172,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Cleanup subscription and update status on unmount
     return () => {
       if (user?.uid) {
-        updateUserStatus(user.uid, 'offline');
+        updateUserStatus(user.uid, "offline");
       }
       unsubscribe();
     };
@@ -168,7 +183,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const confirmation = window.confirm("Are you sure you want to log out?");
       if (!confirmation || !user) return;
 
-      await updateUserStatus(user.uid, 'offline');
+      await updateUserStatus(user.uid, "offline");
       await signOut(auth);
       setUser(null);
       setUserData(null);
@@ -186,20 +201,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loading,
     logout,
     updateUserProfile,
-    refreshUserData
+    refreshUserData,
   };
 
   if (loading) {
-    return <div className="w-full h-screen grid place-items-center">
-      <div className="loader"></div>
-    </div>;
+    return (
+      <div className="w-full h-screen grid place-items-center">
+        <div className="loader"></div>
+      </div>
+    );
   }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

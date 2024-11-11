@@ -18,12 +18,13 @@ import toast from "react-hot-toast";
 
 const getPolls = async (
   limitCount: number,
-  lastVisible: Poll | null = null
+  lastVisible: Poll | null = null,
+  isBlocked: boolean = false
 ) => {
   const pollsRef = collection(db, "polls");
   let q = query(
     pollsRef,
-    where("isBlocked", "==", false),
+    where("isBlocked", "==", isBlocked),
     orderBy("createdAt"),
     limit(limitCount)
   );

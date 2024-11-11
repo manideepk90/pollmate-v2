@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
+import { FaBan } from "react-icons/fa";
 
 function PollCard({ poll }: { poll?: Poll }) {
   return (
@@ -26,6 +27,12 @@ function PollCard({ poll }: { poll?: Poll }) {
           className="absolute bg-white grid place-items-center"
         >
           <h3 className="text-primary text-2xl">{poll?.title.slice(0, 20)}</h3>
+          {poll?.isBlocked && (
+            <div className="flex items-center gap-1">
+              <FaBan className="text-red-500" />
+              <p className="text-sm text-red-500 self-end"> Blocked</p>
+            </div>
+          )}
         </div>
       </div>
     </Link>

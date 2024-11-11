@@ -9,6 +9,7 @@ import AdComponent from "../Ads/AdComponent";
 import { getReports } from "@/app/utils/polls";
 import CommonButton from "../buttons/CommonButton";
 import ShareModal from "../Share/ShareModal";
+import { FaBan } from "react-icons/fa";
 interface PollAnalyticsProps {
   poll: Poll;
 }
@@ -67,6 +68,12 @@ function PollAnalytics({ poll }: PollAnalyticsProps) {
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-4">
           <h3 className="text-primary text-2xl font-bold">{poll.title}</h3>
+          {poll.isBlocked && (
+            <div className="flex items-center gap-1">
+              <FaBan className="text-red-500" />
+              <p className="text-sm text-red-500 self-end"> Blocked</p>
+            </div>
+          )}
           <p className="text-gray-600">{poll.description}</p>
           <CommonButton callback={() => setShareModal(true)}>
             Share poll

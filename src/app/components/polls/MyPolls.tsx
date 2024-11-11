@@ -36,35 +36,38 @@ function MyPolls() {
     setLoading(true);
     try {
       const pollsRef = collection(db, "polls");
-      const q = query(pollsRef, where("createdBy", "==", userData?.uid));
-      const querySnapshot = await getDocs(q);
+      if (userData?.uid) {
+        const q = query(pollsRef, where("createdBy", "==", userData?.uid));
+        const querySnapshot = await getDocs(q);
 
-      const fetchedPolls = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Poll[];
+        const fetchedPolls = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Poll[];
 
-      setPolls(fetchedPolls);
+        setPolls(fetchedPolls);
 
-      // Calculate stats
-      const newStats = fetchedPolls.reduce(
-        (acc, poll) => ({
-          totalViews: acc.totalViews + (poll.views || 0),
-          totalVotes:
-            acc.totalVotes +
-            poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0),
-          totalShares: acc.totalShares + 0,
-          pollsCount: fetchedPolls.length,
-        }),
-        {
-          totalViews: 0,
-          totalVotes: 0,
-          totalShares: 0,
-          pollsCount: 0,
-        }
-      );
-
-      setStats(newStats);
+        // Calculate stats
+        const newStats = fetchedPolls.reduce(
+          (acc, poll) => ({
+            totalViews: acc.totalViews + (poll.views || 0),
+            totalVotes:
+              acc.totalVotes +
+              poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0),
+            totalShares: acc.totalShares + 0,
+            pollsCount: fetchedPolls.length,
+          }),
+          {
+            totalViews: 0,
+            totalVotes: 0,
+            totalShares: 0,
+            pollsCount: 0,
+          }
+        );
+        setStats(newStats);
+      } else {
+        toast.error("Please login to view your polls");
+      }
     } catch (error) {
       console.error("Error fetching polls:", error);
       toast.error("Failed to load polls");

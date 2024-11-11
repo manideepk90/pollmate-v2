@@ -24,6 +24,10 @@ const NavBar: React.FC<{
       label: "Home",
       link: "/",
     },
+    {
+      label: "Polls",
+      link: "/polls",
+    },
 
     {
       label: "My polls",
@@ -168,7 +172,12 @@ const NavBar: React.FC<{
                   className="rounded-full object-cover"
                 />
               ) : userData?.name ? (
-                userData.name[0].toUpperCase()
+                <div
+                  onClick={() => setIsMenuOpen(true)}
+                  className="w-[30px] h-[30px] rounded-full border border-gray-300 text-primary grid place-items-center cursor-pointer"
+                >
+                  {userData.name?.[0].toUpperCase()}
+                </div>
               ) : (
                 // <div
                 //   onClick={() =>
@@ -197,7 +206,7 @@ const NavBar: React.FC<{
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="user-menu-button"
-                tabIndex={-1}
+                // tabIndex={-1}
               >
                 {userData?.name && (
                   <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">

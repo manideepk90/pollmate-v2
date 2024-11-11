@@ -11,6 +11,7 @@ import { getLocalStorage, setLocalStorage } from "@/app/utils/localStorage";
 import toast, { Toaster } from "react-hot-toast";
 import ShareModal from "../Share/ShareModal";
 import ReportModal from "../forms/ReportModal";
+import { FaBan } from "react-icons/fa";
 
 function PollDetails() {
   const { id: link } = useParams();
@@ -106,7 +107,16 @@ function PollDetails() {
     setIsReportModalOpen(true);
   };
 
-  return (
+  useEffect(() => {
+    if (poll?.isBlocked) {
+      toast.error("This poll is blocked");
+      // setTimeout(() => {
+      //   router.push("/404");
+      // }, 3000);
+    }
+  }, [poll?.isBlocked]);
+
+  return !poll?.isBlocked ? (
     <div
       style={{
         minWidth: "200px",
@@ -118,6 +128,12 @@ function PollDetails() {
         <h2 className="text-3xl text-center font-bold text-primary">
           {poll?.title}
         </h2>
+        {poll?.isBlocked && (
+          <div className="flex items-center gap-1">
+            <FaBan className="text-red-500" />
+            <p className="text-sm text-red-500 self-end"> Blocked</p>
+          </div>
+        )}
       </div>
 
       <p className="text-md text-slate-500 text-center">{poll?.description}</p>
@@ -207,6 +223,15 @@ function PollDetails() {
         pollUid={poll?.uid as string}
         onClose={() => setIsReportModalOpen(false)}
       />
+    </div>
+  ) : (
+    <div className="flex-1 flex flex-col gap-5 items-center p-6">
+      <Toaster />
+      <h1 className="text-primary text-3xl font-bold">This poll is blocked</h1>
+      <p className="text-primary text-md text-center">
+        Please contact the administrator to unblock this poll
+      </p>
+      <CommonButton callback={() => router.push("/")}>Go to home</CommonButton>
     </div>
   );
 }

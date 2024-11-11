@@ -80,16 +80,6 @@ function RegisterForm() {
         loginTimestamp: Date.now(),
         polls: [],
         image: null,
-        settings: {
-          emailNotifications: true,
-          theme: "light",
-          language: "en",
-        },
-        stats: {
-          totalPolls: 0,
-          totalVotes: 0,
-          totalViews: 0,
-        },
       });
     } catch (error) {
       console.error("Error creating user document:", error);
