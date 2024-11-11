@@ -8,6 +8,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { toast, Toaster } from "react-hot-toast";
 import { auth } from "@/firebase/initFirebase";
 import { useRouter, useSearchParams } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase/initFirebase";
 
 function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -55,6 +57,16 @@ function LoginForm() {
         password
       );
       const user = userCredential.user;
+
+      // Check if user is blocked
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userData = userDoc.data();
+
+      if (userData?.isBlocked) {
+        toast.dismiss(loadingToastId);
+        router.push('/blocked');
+        return;
+      }
 
       // Get user's custom claims (including admin status)
       const idTokenResult = await user.getIdTokenResult();

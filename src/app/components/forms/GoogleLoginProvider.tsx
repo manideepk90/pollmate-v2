@@ -51,10 +51,13 @@ const GoogleLoginProvider = () => {
         const userRef = await checkIfNewUser(user.uid);
 
         if (userRef.exists()) {
-          console.log("User exists, redirecting...");
+          const userData = userRef.data();
+          if (userData.isBlocked) {
+            router.push('/blocked');
+            return;
+          }
         } else {
           await createNewUser(user);
-          console.log("New user created, redirecting...");
         }
 
         if (returnUrl) {
