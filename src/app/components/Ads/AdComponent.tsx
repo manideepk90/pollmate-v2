@@ -7,6 +7,7 @@ import {
   getDocs,
   updateDoc,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/firebase/initFirebase";
 import Image from "next/image";
@@ -30,6 +31,8 @@ interface Ad {
 function AdComponent() {
   const [currentAd, setCurrentAd] = useState<Ad | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAds, setShowAds] = useState(true);
+  const [showInactiveAds, setShowInactiveAds] = useState(false);
 
   const incrementViews = async (adId: string, currentViews: number) => {
     try {
@@ -51,7 +54,28 @@ function AdComponent() {
     }
   };
 
+  useEffect(() => {
+    const fetchMetaConfig = async () => {
+      try {
+        const metaDoc = await getDoc(doc(db, "meta", "config"));
+        if (metaDoc.exists()) {
+          setShowAds(metaDoc.data().showAds ?? true);
+          setShowInactiveAds(metaDoc.data().showInactiveAds ?? false);
+        }
+      } catch (error) {
+        console.error("Error fetching meta config:", error);
+      }
+    };
+
+    fetchMetaConfig();
+  }, []);
+
   const fetchRandomAd = async () => {
+    if (!showAds) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const adsRef = collection(db, "ads");
@@ -68,8 +92,7 @@ function AdComponent() {
         .map((doc) => ({ id: doc.id, ...doc.data() } as Ad))
         .filter((ad) => ad.currentViews < ad.maxViews);
 
-      // If no ads with remaining views, get any active unblocked ad
-      if (availableAds.length === 0) {
+      if (availableAds.length === 0 && showInactiveAds) {
         availableAds = querySnapshot.docs.map(
           (doc) => ({ id: doc.id, ...doc.data() } as Ad)
         );
@@ -80,7 +103,6 @@ function AdComponent() {
         const selectedAd = availableAds[randomIndex];
         setCurrentAd(selectedAd);
 
-        // Increment views when ad is displayed
         await incrementViews(selectedAd.id, selectedAd.currentViews);
       }
     } catch (error) {
@@ -92,7 +114,9 @@ function AdComponent() {
 
   useEffect(() => {
     fetchRandomAd();
-  }, []);
+  }, [showAds, showInactiveAds]);
+
+  if (!showAds) return <div className="flex-1"></div>;
 
   if (loading) {
     return (

@@ -8,6 +8,7 @@ import SearchComponent from "@/app/components/common/SearchComponent";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/initFirebase";
 import toast, { Toaster } from "react-hot-toast";
+import MetaConfigSection from "@/app/components/MetaConfig/MetaConfigSection";
 
 interface AdStats {
   totalViews: number;
@@ -111,6 +112,8 @@ function Page() {
           </CommonButton>
         </Link>
       </div>
+      {/* Meta Config Section */}
+      <MetaConfigSection />
 
       {/* Stats Section */}
       <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 my-6">

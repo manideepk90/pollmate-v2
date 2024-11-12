@@ -87,6 +87,12 @@ function PollAnalytics({ poll }: PollAnalyticsProps) {
               <span className="font-bold">{formatNumber(totalVotes)}</span>{" "}
               total votes
             </p>
+            <p className="text-primary">
+              <span className="font-bold">
+                {formatNumber(poll.totalShares || 0)}
+              </span>{" "}
+              total shares
+            </p>
             <p className="text-gray-500 text-sm">
               Created: {formatDate(poll.createdAt)}
             </p>

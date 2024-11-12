@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import PollOptionItem from "./PollOption";
 import CommonButton from "../buttons/CommonButton";
 import { formatDate } from "@/app/utils/dateUtils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useParams } from "next/navigation";
 import { getPoll, votePoll, updatePollViews } from "@/app/utils/polls";
 import { getLocalStorage, setLocalStorage } from "@/app/utils/localStorage";
@@ -12,26 +12,78 @@ import toast, { Toaster } from "react-hot-toast";
 import ShareModal from "../Share/ShareModal";
 import ReportModal from "../forms/ReportModal";
 import { FaBan } from "react-icons/fa";
+import {
+  collection,
+  getDocs,
+  where,
+  increment,
+  query,
+  updateDoc,
+} from "firebase/firestore";
+import { addDoc } from "firebase/firestore";
+import { db } from "@/firebase/initFirebase";
+import { serverTimestamp } from "firebase/firestore";
+import { useAuth } from "@/app/context/AuthContext";
 
 function PollDetails() {
   const { id: link } = useParams();
+  const searchParams = useSearchParams();
+  const sharedBy = searchParams.get("sharedBy");
   const [poll, setPoll] = useState<Poll | undefined>(undefined);
   const [voted, setVoted] = useState<string | null>(null);
   const router = useRouter();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const { user } = useAuth();
   const handleShareClick = () => {
     setIsShareModalOpen(true);
   };
+
+  useEffect(() => {
+    const trackSharedVisit = async () => {
+      if (!sharedBy) return;
+      if (!poll || Object.keys(poll).length === 0) return;
+      if (sharedBy === user?.uid) return;
+
+      try {
+        const sharedReportsRef = collection(db, "sharedReports");
+        const q = query(
+          sharedReportsRef,
+          where("pollId", "==", poll.uid),
+          where("sharedBy", "==", sharedBy)
+        );
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          await addDoc(sharedReportsRef, {
+            sharedBy,
+            pollId: poll.uid,
+            shareCount: increment(1),
+          });
+        } else {
+          await updateDoc(querySnapshot.docs[0].ref, {
+            shareCount: increment(1),
+          });
+        }
+      } catch (error) {
+        console.error("Error tracking shared visit:", error);
+      }
+    };
+
+    trackSharedVisit();
+  }, [sharedBy, poll, user?.uid]);
   useEffect(() => {
     const fetchPoll = async () => {
       try {
         const pollData = await getPoll(link as string);
+
         setPoll(pollData);
 
         // Check if user has viewed this poll before
         const viewKey = `poll_view_${link}`;
         const hasViewedBefore = getLocalStorage(viewKey);
+
+        if (sharedBy) {
+        }
 
         if (!hasViewedBefore) {
           // Update view count in Firestore

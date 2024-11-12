@@ -14,5 +14,6 @@ type Poll = {
   views: number;
   isBlocked: boolean;
   image?: string;
+  totalShares?: number;
   createdBy: string;
 };

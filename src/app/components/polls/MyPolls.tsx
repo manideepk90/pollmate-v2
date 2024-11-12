@@ -54,17 +54,29 @@ function MyPolls() {
             totalVotes:
               acc.totalVotes +
               poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0),
-            totalShares: acc.totalShares + 0,
             pollsCount: fetchedPolls.length,
           }),
           {
             totalViews: 0,
             totalVotes: 0,
-            totalShares: 0,
             pollsCount: 0,
           }
         );
-        setStats(newStats);
+        const sharedReportsRef = collection(db, "sharedReports");
+        const q2 = query(
+          sharedReportsRef,
+          where(
+            "pollId",
+            "in",
+            fetchedPolls.map((poll) => poll?.uid)
+          )
+        );
+        const querySnapshot2 = await getDocs(q2);
+        const totalShares = querySnapshot2.docs.reduce(
+          (sum, doc) => sum + (doc.data().shareCount || 0),
+          0
+        );
+        setStats({ ...newStats, totalShares });
       } else {
         toast.error("Please login to view your polls");
       }
