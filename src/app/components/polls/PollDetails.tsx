@@ -31,6 +31,7 @@ function PollDetails() {
   const sharedBy = searchParams.get("sharedBy");
   const [poll, setPoll] = useState<Poll | undefined>(undefined);
   const [voted, setVoted] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -112,6 +113,9 @@ function PollDetails() {
 
   const handleVote = async (value: string) => {
     try {
+      if (!poll || loading) return;
+      setLoading(true);
+
       const voteKey = `poll_vote_${link}`;
       const previousVote = getLocalStorage(voteKey);
 
@@ -146,6 +150,8 @@ function PollDetails() {
       console.error("Error voting:", error);
       toast.dismiss();
       toast.error("Failed to submit vote");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -246,6 +252,7 @@ function PollDetails() {
           poll?.options?.length > 0 &&
           poll?.options.map((option, index) => (
             <PollOptionItem
+              loading={loading}
               key={index}
               option={option}
               active={option.value === voted}

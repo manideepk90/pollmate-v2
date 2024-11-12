@@ -1,6 +1,7 @@
 import React from "react";
 
 function PollOption({
+  loading = false,
   active = false,
   option = {
     value: "option",
@@ -8,6 +9,7 @@ function PollOption({
   },
   callback,
 }: {
+  loading?: boolean;
   active?: boolean;
   option?: {
     value?: string;
@@ -24,7 +26,7 @@ function PollOption({
     flex flex-col items-center justify-center  gap-1 
     ${active ? "bg-primary border-white" : "bg-white border-primary"}
     `}
-      onClick={handleClick}
+      onClick={!loading ? handleClick : undefined}
     >
       <p className={`text-xl ${active ? "text-white" : "text-primary"}`}>
         {option?.value}

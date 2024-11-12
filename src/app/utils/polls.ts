@@ -130,15 +130,18 @@ export const votePoll = async (
       }
 
       const pollData = pollSnapshot.data() as Poll;
-      const newOptions = pollData.options.map((option) => ({
-        ...option,
-        votes:
+      const newOptions = pollData.options.map((option) => {
+        const optionValue =
           option.value === value
             ? option.votes + 1
             : option.value === removeExistingVote
             ? option.votes - 1
-            : option.votes,
-      }));
+            : option.votes;
+        return {
+          ...option,
+          votes: optionValue < 0 ? 0 : optionValue,
+        };
+      });
 
       const newPollData = {
         ...pollData,
