@@ -4,6 +4,7 @@ import AdComponent from "@/app/components/Ads/AdComponent";
 import PollList from "@/app/components/pages/PollList";
 import PollDetails from "@/app/components/polls/PollDetails";
 import React from "react";
+import AdSection from "@/app/components/Ads/AdSection";
 
 // Generate dynamic metadata for the poll
 export async function generateMetadata({
@@ -67,6 +68,7 @@ function Page() {
         <h6 className="text-primary text-2xl font-bold">Discover more polls</h6>
         <PollList />
       </div>
+      <AdSection />
     </div>
   );
 }
