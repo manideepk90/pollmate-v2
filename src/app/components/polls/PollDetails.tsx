@@ -72,26 +72,30 @@ function PollDetails() {
 
     trackSharedVisit();
   }, [sharedBy, poll, user?.uid]);
+
+  useEffect(() => {
+    const trackView = async () => {
+      if (!link) return;
+      if (!poll || Object.keys(poll).length === 0) return;
+      const viewKey = `poll_view_${link}`;
+      const hasViewedBefore = getLocalStorage(viewKey);
+
+      if (!hasViewedBefore) {
+        // Update view count in Firestore
+        await updatePollViews(link as string);
+        // Mark as viewed in localStorage
+        setLocalStorage(viewKey, "true");
+      }
+    };
+
+    trackView();
+  }, [link, poll]);
+
   useEffect(() => {
     const fetchPoll = async () => {
       try {
         const pollData = await getPoll(link as string);
-
         setPoll(pollData);
-
-        // Check if user has viewed this poll before
-        const viewKey = `poll_view_${link}`;
-        const hasViewedBefore = getLocalStorage(viewKey);
-
-        if (sharedBy) {
-        }
-
-        if (!hasViewedBefore) {
-          // Update view count in Firestore
-          await updatePollViews(link as string);
-          // Mark as viewed in localStorage
-          setLocalStorage(viewKey, "true");
-        }
       } catch (error) {
         toast.error("No poll found");
         setTimeout(() => {
@@ -135,7 +139,6 @@ function PollDetails() {
         setPoll(result as Poll);
         toast.dismiss();
         toast.success("Vote submitted successfully");
-
         // Store vote in localStorage
         setLocalStorage(
           voteKey,
@@ -149,9 +152,12 @@ function PollDetails() {
     } catch (error) {
       console.error("Error voting:", error);
       toast.dismiss();
-      toast.error("Failed to submit vote");
+      toast.error("Failed to submit vote, please try again");
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        toast.dismiss();
+      }, 1000);
     }
   };
 
@@ -161,7 +167,6 @@ function PollDetails() {
       toast.error("You have already reported this poll");
       return;
     }
-
     setIsReportModalOpen(true);
   };
 

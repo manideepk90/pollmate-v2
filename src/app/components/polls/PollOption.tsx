@@ -25,6 +25,7 @@ function PollOption({
       className={`w-full min-h-4 rounded-full border-2 p-1 cursor-pointer select-none
     flex flex-col items-center justify-center  gap-1 
     ${active ? "bg-primary border-white" : "bg-white border-primary"}
+    ${loading ? "opacity-50 cursor-not-allowed" : ""}
     `}
       onClick={!loading ? handleClick : undefined}
     >

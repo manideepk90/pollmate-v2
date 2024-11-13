@@ -1,6 +1,9 @@
 "use client";
 import PollAnalytics from "@/app/components/polls/PollAnalytics";
 import { getPoll } from "@/app/utils/polls";
+import { collection, query, where } from "firebase/firestore";
+import { getDocs } from "firebase/firestore";
+import { db } from "@/firebase/initFirebase";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -15,7 +18,15 @@ function PollPage() {
       try {
         if (!link) return;
         const pollData = await getPoll(link as string);
-        setPoll(pollData);
+        if (!pollData) return;
+        const sharedReportsRef = collection(db, "sharedReports");
+        const q = query(sharedReportsRef, where("pollId", "==", pollData?.uid));
+        const querySnapshot = await getDocs(q);
+        const totalShares = querySnapshot.docs.reduce(
+          (sum, doc) => sum + (doc.data().shareCount || 0),
+          0
+        );
+        setPoll({ ...pollData, totalShares });
       } catch (error) {
         console.error(error);
         toast.error("Failed to load poll");

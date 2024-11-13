@@ -107,8 +107,9 @@ function CreatePollPage() {
         setLoading(false);
         return;
       }
+      const imageId = uuidv4();
       const storage = getStorage();
-      const storageRef = ref(storage, `users/${user.uid}/profile.jpg`);
+      const storageRef = ref(storage, `users/${user.uid}/${imageId}.jpg`);
       await uploadBytes(storageRef, image);
       toast.success("Image uploaded successfully");
       downloadURL = await getDownloadURL(storageRef);
